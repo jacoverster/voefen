@@ -1,19 +1,16 @@
 /**
- * Beeps (Web Audio API) + optional spoken cues (SpeechSynthesis).
- * Works best after a user gesture (Start) unlocks audio on TVs/browsers.
+ * Beeps via Web Audio API.
+ * Unlocked on a user gesture (Start / Settings) — required by most browsers/TVs.
  */
 window.WorkoutAudio = (function () {
   let ctx = null;
   let beepsEnabled = true;
-  let voiceEnabled = true;
   let unlocked = false;
 
   function loadPrefs() {
     try {
       const b = localStorage.getItem("fw_beeps");
-      const v = localStorage.getItem("fw_voice");
       if (b !== null) beepsEnabled = b === "1";
-      if (v !== null) voiceEnabled = v === "1";
     } catch (_) {
       /* ignore */
     }
@@ -22,7 +19,6 @@ window.WorkoutAudio = (function () {
   function savePrefs() {
     try {
       localStorage.setItem("fw_beeps", beepsEnabled ? "1" : "0");
-      localStorage.setItem("fw_voice", voiceEnabled ? "1" : "0");
     } catch (_) {
       /* ignore */
     }
@@ -40,13 +36,10 @@ window.WorkoutAudio = (function () {
     return ctx;
   }
 
+  /** Call from a user gesture so audio is allowed. */
   function unlock() {
     unlocked = true;
     ensureCtx();
-    // Prime speech on some browsers
-    if (window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-    }
   }
 
   function tone(freq, duration, type, gainValue, when) {
@@ -102,43 +95,8 @@ window.WorkoutAudio = (function () {
     });
   }
 
-  function speak(text, opts) {
-    if (!voiceEnabled || !unlocked) return;
-    if (!window.speechSynthesis || !text) return;
-    try {
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.rate = (opts && opts.rate) || 1.0;
-      u.pitch = 1.0;
-      u.volume = 1.0;
-      // Prefer an English voice if available
-      const voices = window.speechSynthesis.getVoices();
-      const en =
-        voices.find((v) => /en(-|_)?US/i.test(v.lang) && /google|natural|premium|enhanced/i.test(v.name)) ||
-        voices.find((v) => /^en/i.test(v.lang));
-      if (en) u.voice = en;
-      window.speechSynthesis.speak(u);
-    } catch (_) {
-      /* speech may be unsupported on some TV browsers */
-    }
-  }
-
-  function stopSpeak() {
-    if (window.speechSynthesis) {
-      try {
-        window.speechSynthesis.cancel();
-      } catch (_) {}
-    }
-  }
-
   function setBeeps(on) {
     beepsEnabled = !!on;
-    savePrefs();
-  }
-
-  function setVoice(on) {
-    voiceEnabled = !!on;
-    if (!on) stopSpeak();
     savePrefs();
   }
 
@@ -146,16 +104,7 @@ window.WorkoutAudio = (function () {
     return beepsEnabled;
   }
 
-  function getVoice() {
-    return voiceEnabled;
-  }
-
   loadPrefs();
-
-  // Chrome loads voices async
-  if (window.speechSynthesis) {
-    window.speechSynthesis.onvoiceschanged = function () {};
-  }
 
   return {
     unlock,
@@ -163,11 +112,7 @@ window.WorkoutAudio = (function () {
     workStart,
     restStart,
     complete,
-    speak,
-    stopSpeak,
     setBeeps,
-    setVoice,
     getBeeps,
-    getVoice,
   };
 })();

@@ -22,7 +22,6 @@
     btnStart: $("btn-start"),
     btnSettings: $("btn-settings"),
     btnBeeps: $("btn-beeps"),
-    btnVoice: $("btn-voice"),
     btnFullscreen: $("btn-fullscreen"),
     blockLabel: $("block-label"),
     progressFill: $("progress-fill"),
@@ -66,7 +65,7 @@
   let sessionStartedAt = 0;
   let elapsedOffsetMs = 0;
   let runningElapsedMs = 0;
-  let lastSpokenSecond = null;
+  let lastTickSecond = null;
 
   function loadSelectedId() {
     try {
@@ -276,7 +275,7 @@
 
     stepTotalMs = step.seconds * 1000;
     remainingMs = stepTotalMs;
-    lastSpokenSecond = null;
+    lastTickSecond = null;
     updateTimerDisplay();
 
     if (isRest || isBreak) {
@@ -284,11 +283,6 @@
     } else {
       Audio.workStart();
     }
-
-    const speakName = isRest
-      ? `Rest. ${step.nextName ? "Next up, " + step.nextName : ""}`
-      : step.name + ". " + (step.cue || "");
-    Audio.speak(speakName);
   }
 
   function updateTimerDisplay() {
@@ -302,8 +296,8 @@
     const urgent = whole <= 3 && whole > 0 && !paused;
     els.timerDigits.classList.toggle("urgent", urgent);
 
-    if (urgent && lastSpokenSecond !== whole) {
-      lastSpokenSecond = whole;
+    if (urgent && lastTickSecond !== whole) {
+      lastTickSecond = whole;
       Audio.tick();
     }
 
@@ -372,6 +366,7 @@
     playlist = built.playlist;
     totalWorkSeconds = built.totalWorkSeconds;
 
+    // Unlock audio inside the Start click so beeps are allowed
     Audio.unlock();
     index = 0;
     paused = false;
@@ -386,9 +381,7 @@
 
   function finishWorkout() {
     stopLoop();
-    Audio.stopSpeak();
     Audio.complete();
-    Audio.speak("Workout complete! Amazing work, family!");
     els.progressFill.style.width = "100%";
     const mins =
       Math.round(runningElapsedMs / 60000) ||
@@ -407,12 +400,9 @@
     els.btnPause.textContent = paused ? "Resume" : "Pause";
     if (paused) {
       elapsedOffsetMs = runningElapsedMs;
-      Audio.stopSpeak();
-      Audio.speak("Paused");
     } else {
       sessionStartedAt = performance.now();
       lastTs = 0;
-      Audio.speak("Let's go");
       if (!rafId) startLoop();
     }
   }
@@ -422,7 +412,6 @@
     const now = Date.now();
     if (now < endArmedUntil) {
       stopLoop();
-      Audio.stopSpeak();
       endArmedUntil = 0;
       els.btnEnd.textContent = "End";
       showScreen("home");
@@ -430,7 +419,6 @@
     }
     endArmedUntil = now + 3000;
     els.btnEnd.textContent = "End? Again";
-    Audio.speak("Press end again to quit");
     setTimeout(() => {
       if (Date.now() >= endArmedUntil - 50) {
         els.btnEnd.textContent = "End";
@@ -440,9 +428,7 @@
 
   function syncToggles() {
     setToggle(els.btnBeeps, Audio.getBeeps());
-    setToggle(els.btnVoice, Audio.getVoice());
-    const muted = !Audio.getBeeps() && !Audio.getVoice();
-    els.btnMute.textContent = muted ? "Sound Off" : "Sound On";
+    els.btnMute.textContent = Audio.getBeeps() ? "Sound On" : "Sound Off";
   }
 
   function toggleFullscreen() {
@@ -550,12 +536,6 @@
     syncToggles();
     if (Audio.getBeeps()) Audio.workStart();
   });
-  els.btnVoice.addEventListener("click", () => {
-    Audio.unlock();
-    Audio.setVoice(!Audio.getVoice());
-    syncToggles();
-    if (Audio.getVoice()) Audio.speak("Voice coaching on");
-  });
   els.btnFullscreen.addEventListener("click", toggleFullscreen);
 
   els.btnPause.addEventListener("click", togglePause);
@@ -563,16 +543,8 @@
   els.btnPrev.addEventListener("click", () => advance(-1));
   els.btnEnd.addEventListener("click", endEarly);
   els.btnMute.addEventListener("click", () => {
-    const bothOn = Audio.getBeeps() || Audio.getVoice();
-    if (bothOn) {
-      Audio.setBeeps(false);
-      Audio.setVoice(false);
-      Audio.stopSpeak();
-    } else {
-      Audio.setBeeps(true);
-      Audio.setVoice(true);
-      Audio.unlock();
-    }
+    Audio.setBeeps(!Audio.getBeeps());
+    if (Audio.getBeeps()) Audio.unlock();
     syncToggles();
   });
 
@@ -586,11 +558,9 @@
   renderWorkoutPicker();
   updatePickerUI();
   updateHomeMeta();
-  syncToggles();
   els.btnBeeps.dataset.label = "Beeps";
-  els.btnVoice.dataset.label = "Voice";
+  syncToggles();
   setToggle(els.btnBeeps, Audio.getBeeps());
-  setToggle(els.btnVoice, Audio.getVoice());
 
   console.info(
     `Voefen ready — ${workouts.length} workouts. Selected: ${selectedId} (~${Math.round(totalWorkSeconds / 60)} min, ${playlist.length} steps)`

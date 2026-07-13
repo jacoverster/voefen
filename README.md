@@ -47,7 +47,7 @@ Every workout uses the same pattern:
 - Everyone does the **same move together**
 - **Easy** and **hard** tips on every exercise
 - Large **countdown timer**, progress bar, and emoji stage art
-- **Beeps** + optional **voice** coaching (toggle on home → Settings)
+- **Beeps** for start/end and last-3-second countdown (toggle in Settings)
 - TV remote: arrows to move, Enter to select, Space / Play-Pause to pause
 
 ## Edit content
