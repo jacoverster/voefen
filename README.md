@@ -1,31 +1,58 @@
 # Voefen
 
-A TV-friendly website that guides **Jaco, Mia, Hanan, Lika, and Thomas** through family bodyweight workouts together.
+Family bodyweight workouts on the TV — timers, easy/hard cues, and remote-friendly controls for the whole crew.
 
-Built for a **Samsung TV browser**, hosted free on **Firebase Hosting**.
+**Live:** [https://voefen.web.app](https://voefen.web.app)  
+**Repo:** [github.com/jacoverster/voefen](https://github.com/jacoverster/voefen)
 
-## Features
+Built for a **Samsung TV browser** (and any large screen). Free **Firebase Hosting**. No login, no backend — static HTML/CSS/JS only.
 
-- **5 pre-built workouts** — pick on the home screen (selection remembered)
-- **Everyone together** — same exercise at the same time
-- **Easy & hard options** on every move
-- **Big timers** + progress bar (TV-readable)
-- **Emoji-forward UI**, beeps + optional voice, remote-friendly focus
-- **No login / no backend** — pure static files
+## Family
+
+| Name | Colour |
+|------|--------|
+| Jaco | Orange |
+| Mia | Purple |
+| Hanan | Green |
+| Lika | Pink |
+| Thomas | Yellow |
+
+Edit names, emoji, and colours in `public/workout-data.js` → `FAMILY`.
+
+## Workouts
+
+Pick one on the home screen (selection is remembered in the browser).
+
+| Workout | ~Time | Rounds × moves | Vibe |
+|---------|-------|----------------|------|
+| Family Power | ~27 min | 4 × 5 | Full-energy classic |
+| Quick Blast | ~14 min | 3 × 4 | Busy-day burner |
+| Cardio Party | ~25 min | 4 × 5 | Jump, dance, smile |
+| Strong Together | ~21 min | 3 × 5 | Strength focus |
+| Stretch & Flow | ~18 min | 3 × 4 | Gentle mobility |
+
+Times are calculated from the real playlist (warm-up + rounds + water breaks + cool-down).
 
 ## Workout shape
 
-Every workout is the same pattern (easy to edit):
+Every workout uses the same pattern:
 
-1. **Warm-up** — 3–5 exercises (no rests between them)
-2. **Circuit** — 4–5 simple exercises, repeated for `rounds` (e.g. 3 or 4)
-3. **Cool-down** — a few stretches + breathing
+1. **Warm-up** — 3–5 exercises, no rests between moves  
+2. **Circuit** — 4–5 simple exercises, repeated for `rounds`  
+3. **Water break** between rounds (optional)  
+4. **Cool-down** — stretches + breathing  
 
-Between rounds there is an optional water break (`restBetweenRounds`).
+## Features
 
-## Edit workouts
+- Everyone does the **same move together**
+- **Easy** and **hard** tips on every exercise
+- Large **countdown timer**, progress bar, and emoji stage art
+- **Beeps** + optional **voice** coaching (toggle on home → Settings)
+- TV remote: arrows to move, Enter to select, Space / Play-Pause to pause
 
-All content lives in **`public/workout-data.js`**:
+## Edit content
+
+All workouts and family data live in **`public/workout-data.js`**.
 
 ```js
 {
@@ -33,53 +60,63 @@ All content lives in **`public/workout-data.js`**:
   title: "Family Power",
   tagline: "Full-energy classic",
   emoji: "💪",
-  warmup: { exercises: [ /* 3–5 */ ] },
-  circuit: {
-    rounds: 4,                    // change this to do more/less rounds
-    restBetweenExercises: 15,
-    restBetweenRounds: 60,        // 0 = no water break
-    exercises: [ /* 4–5, same each round */ ],
+  warmup: {
+    exercises: [ /* 3–5 moves */ ],
   },
-  cooldown: { exercises: [ /* stretches + breathing */ ] },
+  circuit: {
+    rounds: 4,                 // more or fewer rounds
+    restBetweenExercises: 15,  // seconds between moves in a round
+    restBetweenRounds: 60,     // water break; use 0 to skip
+    exercises: [ /* 4–5 moves, same each round */ ],
+  },
+  cooldown: {
+    exercises: [ /* stretches + breathing */ ],
+  },
 }
 ```
 
-Helper: `ex(name, emoji, seconds, cue, easy, hard)`  
-Optional 6th arg: per-step `restAfter` override.
+Helper:
 
-## Local preview
-
-```bash
-cd family-workout
-npx --yes serve public -p 5173
+```js
+ex(name, emoji, seconds, cue, easy, hard)
+// optional 6th arg: restAfter override for that step only
 ```
-
-Open http://localhost:5173
-
-## Deploy to Firebase (free)
-
-```bash
-cd family-workout
-firebase deploy --only hosting
-```
-
-**Live URL:** https://voefen.web.app  
-
-Project ID: `voefen`. Bookmark on the TV after the first visit.
 
 ## Project layout
 
 ```
-family-workout/
-  firebase.json
+voefen/
+  firebase.json       # Firebase Hosting config
+  .firebaserc         # project id: voefen
   public/
-    index.html
-    styles.css
-    app.js
-    audio.js
-    workout-data.js   # family + exercises
+    index.html        # screens (home, workout, done)
+    styles.css        # TV-first layout
+    app.js            # timer, picker, remote nav
+    audio.js          # beeps + speech
+    workout-data.js   # FAMILY + WORKOUTS
+  README.md
 ```
+
+## Local preview
+
+```bash
+npx --yes serve public -p 5173
+```
+
+Open [http://localhost:5173](http://localhost:5173).
+
+## Deploy
+
+Requires [Firebase CLI](https://firebase.google.com/docs/cli) and login (`firebase login`).
+
+```bash
+firebase deploy --only hosting
+```
+
+Deploys to project **`voefen`** → [https://voefen.web.app](https://voefen.web.app).
+
+On the TV: open that URL once and **bookmark** it so you don’t retype with the remote.
 
 ## License
 
-Personal / family use — enjoy the sweat.
+Personal / family use.
