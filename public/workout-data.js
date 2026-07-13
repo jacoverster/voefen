@@ -21,11 +21,11 @@
   "use strict";
 
   window.FAMILY = [
-    { id: "dad", label: "Jaco", emoji: "👨🏼", color: "#fb923c" },
-    { id: "mom", label: "Mia", emoji: "👩🏼", color: "#a78bfa" },
-    { id: "kid1", label: "Hanan", emoji: "👦🏼", color: "#34d399" },
-    { id: "kid2", label: "Lika", emoji: "👧🏼", color: "#f472b6" },
-    { id: "kid3", label: "Thomas", emoji: "👦🏼", color: "#fbbf24" },
+    { id: "dad", label: "Dad", emoji: "👨🏼", color: "#fb923c" },
+    { id: "mom", label: "Mom", emoji: "👩🏼", color: "#a78bfa" },
+    { id: "kid1", label: "Kid 1", emoji: "👦🏼", color: "#34d399" },
+    { id: "kid2", label: "Kid 2", emoji: "👧🏼", color: "#f472b6" },
+    { id: "kid3", label: "Kid 3", emoji: "👦🏼", color: "#fbbf24" },
   ];
 
   /**

@@ -2,7 +2,7 @@
 
 Family bodyweight workouts on the TV — timers, easy/hard cues, and remote-friendly controls for the whole crew.
 
-**Live:** [https://voefen.web.app](https://voefen.web.app)  
+**Live:** [https://voefen.web.app](https://voefen.web.app)
 **Repo:** [github.com/jacoverster/voefen](https://github.com/jacoverster/voefen)
 
 Built for a **Samsung TV browser** (and any large screen). Free **Firebase Hosting**. No login, no backend — static HTML/CSS/JS only.
@@ -11,11 +11,11 @@ Built for a **Samsung TV browser** (and any large screen). Free **Firebase Hosti
 
 | Name | Colour |
 |------|--------|
-| Jaco | Orange |
-| Mia | Purple |
-| Hanan | Green |
-| Lika | Pink |
-| Thomas | Yellow |
+| Dad | Orange |
+| Mom | Purple |
+| Kid 1 | Green |
+| Kid 2 | Pink |
+| Kid 3 | Yellow |
 
 Edit names, emoji, and colours in `public/workout-data.js` → `FAMILY`.
 
@@ -37,10 +37,10 @@ Times are calculated from the real playlist (warm-up + rounds + water breaks + c
 
 Every workout uses the same pattern:
 
-1. **Warm-up** — 3–5 exercises, no rests between moves  
-2. **Circuit** — 4–5 simple exercises, repeated for `rounds`  
-3. **Water break** between rounds (optional)  
-4. **Cool-down** — stretches + breathing  
+1. **Warm-up** — 3–5 exercises, no rests between moves
+2. **Circuit** — 4–5 simple exercises, repeated for `rounds`
+3. **Water break** between rounds (optional)
+4. **Cool-down** — stretches + breathing
 
 ## Features
 
