@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#0f0a14" />
+    <meta
+      name="description"
+      content="Voefen — family workouts on the TV. Bodyweight, timers, easy & hard options."
+    />
+    <title>Voefen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💪</text></svg>"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- HOME -->
+    <section id="screen-home" class="screen active" aria-label="Home">
+      <div class="home-shell">
+        <header class="brand">
+          <p class="brand-kicker">Voefen</p>
+          <h1 class="brand-title">
+            <span id="brand-num" class="brand-num">30</span>
+            <span class="brand-unit">min</span>
+          </h1>
+          <p id="home-subtitle" class="subtitle">Everyone moves together</p>
+        </header>
+
+        <div class="team-card">
+          <p class="team-label">Today’s crew</p>
+          <div id="family-row" class="family-row" aria-hidden="true"></div>
+        </div>
+
+        <div class="workout-picker-wrap">
+          <p class="team-label">Choose a workout</p>
+          <div
+            id="workout-picker"
+            class="workout-picker"
+            role="listbox"
+            aria-label="Workouts"
+          ></div>
+        </div>
+
+        <p id="meta-line" class="meta-line">bodyweight · easy &amp; hard options</p>
+
+        <div class="home-actions">
+          <button type="button" id="btn-start" class="primary btn-xl" autofocus>
+            Start Workout
+          </button>
+          <div class="home-secondary">
+            <button type="button" id="btn-settings" class="ghost">Settings</button>
+            <button type="button" id="btn-fullscreen" class="ghost">Fullscreen</button>
+          </div>
+        </div>
+
+        <div id="settings-panel" class="settings-panel" role="region" aria-label="Settings">
+          <button
+            type="button"
+            id="btn-beeps"
+            class="toggle"
+            aria-pressed="true"
+            data-label="Beeps"
+          >
+            Beeps: On
+          </button>
+          <button
+            type="button"
+            id="btn-voice"
+            class="toggle"
+            aria-pressed="true"
+            data-label="Voice"
+          >
+            Voice: On
+          </button>
+        </div>
+
+        <p class="hint">
+          Remote: arrows move · Enter selects · Play/Pause or Space pauses
+        </p>
+      </div>
+    </section>
+
+    <!-- WORKOUT -->
+    <section id="screen-workout" class="screen" aria-label="Workout" aria-live="polite">
+      <div class="top-bar">
+        <div id="block-label" class="block-pill">Warm-Up</div>
+        <div class="progress-wrap">
+          <div class="progress-track" aria-hidden="true">
+            <div id="progress-fill" class="progress-fill"></div>
+          </div>
+          <div id="progress-text" class="progress-text">1 / 1</div>
+        </div>
+        <div id="elapsed-text" class="elapsed-text">0:00</div>
+      </div>
+
+      <div class="workout-main">
+        <div id="stage" class="stage">
+          <div id="paused-banner" class="paused-banner">PAUSED</div>
+          <div id="icon-wrap" class="emoji-stage" aria-hidden="true">💪</div>
+          <h2 id="exercise-name" class="exercise-name">Exercise</h2>
+          <p id="exercise-cue" class="exercise-cue"></p>
+        </div>
+
+        <div class="timer-panel">
+          <div id="timer-label" class="phase-pill work">Work</div>
+          <div id="timer-ring" class="timer-ring" aria-hidden="true">
+            <div id="timer-digits" class="timer-digits">40</div>
+          </div>
+          <div id="next-preview" class="next-preview"></div>
+        </div>
+      </div>
+
+      <div class="tips">
+        <div id="tip-easy" class="tip easy">
+          <div class="tip-title">Easy</div>
+          <div id="tip-easy-body" class="tip-body"></div>
+        </div>
+        <div id="tip-hard" class="tip hard">
+          <div class="tip-title">Hard</div>
+          <div id="tip-hard-body" class="tip-body"></div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button type="button" id="btn-prev" class="ghost">Back</button>
+        <button type="button" id="btn-pause" class="primary">Pause</button>
+        <button type="button" id="btn-skip" class="ghost">Skip</button>
+        <button type="button" id="btn-mute" class="ghost">Sound On</button>
+        <button type="button" id="btn-end" class="ghost quiet">End</button>
+      </div>
+    </section>
+
+    <!-- DONE -->
+    <section id="screen-done" class="screen" aria-label="Complete">
+      <div class="done-shell">
+        <div class="confetti" aria-hidden="true">🎉 💪 ⭐ 🏆 🎉</div>
+        <h1>You did it!</h1>
+        <p id="done-family" class="done-family"></p>
+        <p id="done-stats">Great work, family.</p>
+        <p class="done-sub">Stretch, drink water, and high-five everyone.</p>
+        <div class="home-actions">
+          <button type="button" id="btn-again" class="primary btn-xl">Do it again</button>
+          <button type="button" id="btn-home" class="ghost">Home</button>
+        </div>
+      </div>
+    </section>
+
+    <script src="workout-data.js"></script>
+    <script src="audio.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

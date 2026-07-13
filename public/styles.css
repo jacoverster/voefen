@@ -1,0 +1,844 @@
+/* =========================================================
+   Voefen — Living-room coach (TV-first)
+   ========================================================= */
+
+:root {
+  --bg: #0f0a14;
+  --bg-2: #1a1024;
+  --bg-card: rgba(255, 255, 255, 0.06);
+  --bg-card-solid: #1e152c;
+  --text: #fff7fb;
+  --text-dim: #b9a8c4;
+  --accent: #ff6b4a;
+  --accent-2: #ffb020;
+  --sky: #5ec8ff;
+  --easy: #3dd68c;
+  --hard: #ff6b9d;
+  --rest: #8b93a7;
+  --focus: #ffe566;
+  --radius: 20px;
+  --radius-sm: 14px;
+  --shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+  --font: "Nunito", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  /* Prefer vh so short TV/browser chrome still fits */
+  --safe-pad-x: clamp(12px, 2.5vw, 40px);
+  --safe-pad-y: clamp(8px, 1.5vh, 28px);
+  --block-color: var(--sky);
+  --timer-color: var(--accent);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  max-height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: clamp(15px, 1.6vh + 0.4vw, 24px);
+  line-height: 1.3;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body {
+  background:
+    radial-gradient(ellipse 90% 55% at 50% -15%, rgba(255, 107, 74, 0.22), transparent 55%),
+    radial-gradient(ellipse 50% 45% at 100% 80%, rgba(94, 200, 255, 0.12), transparent 50%),
+    radial-gradient(ellipse 40% 35% at 0% 100%, rgba(167, 139, 250, 0.12), transparent 45%),
+    var(--bg);
+}
+
+/* ---------- Buttons ---------- */
+
+button {
+  font: inherit;
+  font-weight: 800;
+  color: inherit;
+  cursor: pointer;
+  border: 3px solid transparent;
+  background: var(--bg-card-solid);
+  border-radius: 999px;
+  padding: 0.45em 1.15em;
+  min-height: 2.35em;
+  transition:
+    transform 0.12s ease,
+    border-color 0.12s ease,
+    background 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+button:hover {
+  background: #2a1f3d;
+}
+
+button:focus {
+  outline: none;
+}
+
+button:focus-visible {
+  border-color: var(--focus);
+  box-shadow: 0 0 0 4px rgba(255, 229, 102, 0.35), var(--shadow);
+  transform: scale(1.04);
+}
+
+button.primary {
+  background: linear-gradient(135deg, #ff7a45, #ff4d6d);
+  box-shadow: 0 10px 28px rgba(255, 77, 109, 0.35);
+}
+
+button.primary:hover {
+  background: linear-gradient(135deg, #ff8d5c, #ff6280);
+}
+
+button.btn-xl {
+  font-size: 1.1em;
+  min-width: 9em;
+  min-height: 2.6em;
+  padding: 0.55em 1.5em;
+}
+
+button.ghost {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+button.quiet {
+  opacity: 0.75;
+  font-weight: 700;
+}
+
+button.toggle[aria-pressed="true"] {
+  background: rgba(255, 107, 74, 0.18);
+  border-color: rgba(255, 107, 74, 0.55);
+}
+
+button.toggle[aria-pressed="false"] {
+  opacity: 0.8;
+}
+
+/* ---------- Screens ---------- */
+
+.screen {
+  display: none;
+  position: absolute;
+  inset: 0;
+  padding: var(--safe-pad-y) var(--safe-pad-x);
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.screen.active {
+  display: flex;
+}
+
+/* ---------- Home ---------- */
+
+#screen-home {
+  align-items: center;
+  justify-content: center;
+}
+
+.home-shell {
+  width: min(1100px, 100%);
+  max-height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(6px, 1.2vh, 14px);
+  text-align: center;
+  overflow: hidden;
+}
+
+.brand-kicker {
+  margin: 0;
+  font-size: clamp(0.7em, 1.6vh, 0.9em);
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+}
+
+.brand-title {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.2em;
+  line-height: 0.9;
+}
+
+.brand-num {
+  font-size: clamp(2.2rem, 7.5vh, 5rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  background: linear-gradient(180deg, #fff 20%, #ffc9a8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.brand-unit {
+  font-size: clamp(1rem, 2.8vh, 1.6rem);
+  font-weight: 800;
+  color: var(--text-dim);
+  text-transform: lowercase;
+}
+
+.subtitle {
+  margin: 0.15em 0 0;
+  color: var(--text-dim);
+  font-size: clamp(0.85em, 2vh, 1em);
+  font-weight: 700;
+}
+
+.team-card {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius);
+  padding: clamp(6px, 1.2vh, 12px) clamp(10px, 1.5vw, 18px);
+  box-shadow: none;
+  flex-shrink: 0;
+}
+
+.team-label {
+  margin: 0 0 0.4em;
+  font-size: clamp(0.65em, 1.5vh, 0.78em);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.family-row {
+  display: flex;
+  gap: clamp(8px, 1.2vw, 16px);
+  flex-wrap: nowrap;
+  justify-content: center;
+}
+
+.family-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25em;
+  min-width: 3.6em;
+}
+
+.family-chip .badge {
+  width: clamp(40px, 6.5vh, 68px);
+  height: clamp(40px, 6.5vh, 68px);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: clamp(1.2rem, 3.2vh, 2.1rem);
+  line-height: 1;
+  background: color-mix(in srgb, var(--chip-color, var(--sky)) 22%, #1a1024);
+  border: 3px solid var(--chip-color, var(--sky));
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.family-chip .label {
+  font-size: clamp(0.75em, 1.8vh, 0.9em);
+  font-weight: 800;
+  color: var(--text);
+}
+
+.meta-line {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: clamp(0.75em, 1.7vh, 0.9em);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Workout picker — one row on wide screens */
+.workout-picker-wrap {
+  width: 100%;
+  flex-shrink: 0;
+  min-height: 0;
+}
+
+.workout-picker {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: clamp(6px, 0.8vw, 10px);
+}
+
+.workout-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 0.1em;
+  min-width: 0;
+  width: 100%;
+  padding: clamp(0.45em, 1.1vh, 0.75em) 0.7em;
+  border-radius: var(--radius-sm);
+  border: 3px solid rgba(255, 255, 255, 0.12);
+  background: var(--bg-card-solid);
+  box-shadow: none;
+  min-height: 0;
+}
+
+.workout-card .w-emoji {
+  font-size: clamp(1.15em, 2.8vh, 1.5em);
+  line-height: 1;
+}
+
+.workout-card .w-title {
+  font-size: clamp(0.78em, 1.9vh, 0.95em);
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.workout-card .w-meta {
+  font-size: clamp(0.65em, 1.5vh, 0.78em);
+  font-weight: 700;
+  color: var(--text-dim);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.workout-card[aria-selected="true"] {
+  border-color: var(--accent);
+  background: linear-gradient(145deg, rgba(255, 107, 74, 0.2), var(--bg-card-solid));
+  box-shadow: 0 0 0 2px rgba(255, 107, 74, 0.25);
+}
+
+.workout-card:focus-visible {
+  border-color: var(--focus);
+  box-shadow: 0 0 0 4px rgba(255, 229, 102, 0.35);
+  transform: scale(1.02);
+}
+
+.home-actions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55em 0.75em;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.home-secondary {
+  display: flex;
+  gap: 0.55em;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.settings-panel {
+  display: none;
+  gap: 0.55em;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 0.55em 0.9em;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  max-width: 36em;
+  flex-shrink: 0;
+}
+
+.settings-panel.open {
+  display: flex;
+}
+
+.hint {
+  margin: 0;
+  color: rgba(185, 168, 196, 0.75);
+  font-size: clamp(0.65em, 1.5vh, 0.78em);
+  font-weight: 600;
+  max-width: 34em;
+  flex-shrink: 0;
+}
+
+/* ---------- Workout ---------- */
+
+#screen-workout {
+  gap: clamp(6px, 1.2vh, 14px);
+}
+
+.top-bar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.65em;
+  flex-shrink: 0;
+}
+
+.block-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.82em;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #0f0a14;
+  background: var(--block-color, var(--sky));
+  border-radius: 999px;
+  padding: 0.4em 0.95em;
+  white-space: nowrap;
+  max-width: 28vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.progress-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35em;
+  min-width: 0;
+}
+
+.progress-track {
+  width: min(46vw, 520px);
+  height: clamp(8px, 1.2vh, 12px);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  border-radius: 999px;
+  transition: width 0.35s ease;
+}
+
+.progress-text,
+.elapsed-text {
+  font-size: 0.82em;
+  font-weight: 800;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.elapsed-text {
+  min-width: 3.5em;
+  text-align: right;
+}
+
+.workout-main {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: 1.15fr 0.95fr;
+  gap: clamp(8px, 1.5vw, 20px);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.stage,
+.timer-panel {
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(8px, 1.5vh, 20px) clamp(10px, 1.5vw, 24px);
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.stage {
+  gap: 0.2em;
+}
+
+.stage.rest-mode {
+  background: rgba(139, 147, 167, 0.12);
+  border-color: rgba(139, 147, 167, 0.35);
+}
+
+.stage.break-mode {
+  background: rgba(34, 211, 238, 0.08);
+  border-color: rgba(34, 211, 238, 0.35);
+}
+
+.stage.cooldown-mode {
+  background: rgba(61, 214, 140, 0.08);
+  border-color: rgba(61, 214, 140, 0.35);
+}
+
+.emoji-stage {
+  width: min(38%, 22vh, 160px);
+  aspect-ratio: 1;
+  max-height: 28vh;
+  display: grid;
+  place-items: center;
+  font-size: clamp(2.4rem, 9vh, 5.5rem);
+  line-height: 1;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--block-color, var(--sky)) 18%, transparent);
+  border: 2px solid color-mix(in srgb, var(--block-color, var(--sky)) 45%, transparent);
+  margin-bottom: 0.15em;
+  flex-shrink: 1;
+}
+
+.exercise-name {
+  margin: 0;
+  font-size: clamp(1.25rem, 4.5vh, 2.6rem);
+  font-weight: 900;
+  text-align: center;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.exercise-cue {
+  margin: 0.2em 0 0;
+  color: var(--text-dim);
+  text-align: center;
+  font-size: clamp(0.85em, 2vh, 1em);
+  font-weight: 700;
+  max-width: 22em;
+}
+
+.timer-panel {
+  gap: clamp(0.3em, 1vh, 0.65em);
+}
+
+.phase-pill {
+  font-size: 0.85em;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  padding: 0.35em 0.95em;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-dim);
+}
+
+.phase-pill.work {
+  color: #0f0a14;
+  background: var(--accent);
+}
+
+.phase-pill.rest {
+  color: #0f0a14;
+  background: var(--rest);
+}
+
+.phase-pill.break {
+  color: #0f0a14;
+  background: #22d3ee;
+}
+
+.phase-pill.cooldown {
+  color: #0f0a14;
+  background: var(--easy);
+}
+
+.timer-ring {
+  --p: 0;
+  width: min(36vw, 34vh, 260px);
+  aspect-ratio: 1;
+  max-height: 42vh;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--timer-color, var(--accent)) calc(var(--p) * 1%),
+    rgba(255, 255, 255, 0.1) 0
+  );
+  display: grid;
+  place-items: center;
+  position: relative;
+  flex-shrink: 1;
+}
+
+.timer-ring::before {
+  content: "";
+  position: absolute;
+  inset: clamp(8px, 1.5vh, 14px);
+  border-radius: 50%;
+  background: #1a1024;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.timer-digits {
+  position: relative;
+  font-size: clamp(2.4rem, 10vh, 5.5rem);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.timer-digits.urgent {
+  color: var(--focus);
+  animation: pulse 0.9s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.07);
+  }
+}
+
+.next-preview {
+  font-size: 0.95em;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-align: center;
+  min-height: 1.4em;
+}
+
+.next-preview strong {
+  color: var(--text);
+  font-weight: 900;
+}
+
+/* Tips */
+.tips {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(6px, 1vw, 14px);
+  flex-shrink: 0;
+}
+
+.tip {
+  border-radius: var(--radius-sm);
+  padding: clamp(0.45em, 1vh, 0.8em) clamp(0.7em, 1.2vw, 1.1em);
+  background: var(--bg-card);
+  border: 2px solid transparent;
+  min-height: 0;
+}
+
+.tip.easy {
+  border-color: rgba(61, 214, 140, 0.4);
+  background: linear-gradient(145deg, rgba(61, 214, 140, 0.12), var(--bg-card));
+}
+
+.tip.hard {
+  border-color: rgba(255, 107, 157, 0.4);
+  background: linear-gradient(145deg, rgba(255, 107, 157, 0.12), var(--bg-card));
+}
+
+.tip-title {
+  font-size: 0.78em;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.3em;
+}
+
+.tip.easy .tip-title {
+  color: var(--easy);
+}
+
+.tip.hard .tip-title {
+  color: var(--hard);
+}
+
+.tip-body {
+  font-size: clamp(0.85em, 1.9vh, 0.98em);
+  font-weight: 700;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tip.hidden {
+  visibility: hidden;
+}
+
+.controls {
+  display: flex;
+  gap: 0.55em;
+  justify-content: center;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.controls button {
+  min-width: 6.2em;
+}
+
+.paused-banner {
+  display: none;
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 10, 20, 0.94);
+  border: 3px solid var(--focus);
+  color: var(--focus);
+  font-weight: 900;
+  font-size: 1.35em;
+  letter-spacing: 0.16em;
+  padding: 0.45em 1.2em;
+  border-radius: 14px;
+  z-index: 5;
+}
+
+.paused-banner.show {
+  display: block;
+}
+
+/* ---------- Done ---------- */
+
+#screen-done {
+  align-items: center;
+  justify-content: center;
+}
+
+.done-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75em;
+  text-align: center;
+  max-width: 36em;
+}
+
+#screen-done h1 {
+  margin: 0;
+  font-size: clamp(2.4rem, 7vw, 4.4rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.done-family {
+  margin: 0;
+  font-size: 1.15em;
+  font-weight: 800;
+  color: var(--accent-2);
+}
+
+#screen-done #done-stats {
+  margin: 0;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.done-sub {
+  margin: 0 0 0.4em;
+  color: var(--text-dim);
+  font-weight: 700;
+}
+
+.confetti {
+  font-size: clamp(2.2rem, 5.5vw, 3.6rem);
+  letter-spacing: 0.12em;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 900px) {
+  .workout-picker {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px), (max-aspect-ratio: 4/3) {
+  .workout-main {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .timer-ring {
+    width: min(40vw, 28vh, 200px);
+  }
+
+  .timer-digits {
+    font-size: clamp(2rem, 8vh, 4rem);
+  }
+
+  .emoji-stage {
+    width: min(30%, 18vh, 120px);
+    font-size: clamp(2rem, 7vh, 4rem);
+  }
+
+  .top-bar {
+    grid-template-columns: 1fr auto;
+  }
+
+  .elapsed-text {
+    display: none;
+  }
+}
+
+/* Short viewports (laptop browser chrome, some TVs) */
+@media (max-height: 720px) {
+  .hint {
+    display: none;
+  }
+
+  .meta-line {
+    display: none;
+  }
+
+  .brand-kicker {
+    letter-spacing: 0.16em;
+  }
+
+  .tip-body {
+    -webkit-line-clamp: 1;
+  }
+}
+
+@media (max-height: 560px) {
+  .team-label {
+    display: none;
+  }
+
+  .family-chip .label {
+    font-size: 0.7em;
+  }
+
+  .workout-card .w-meta {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timer-digits.urgent {
+    animation: none;
+  }
+
+  button {
+    transition: none;
+  }
+}
+
+/* Fallback if color-mix unsupported */
+@supports not (background: color-mix(in srgb, red 50%, blue)) {
+  .family-chip .badge {
+    background: #2a1f3d;
+  }
+
+  .emoji-stage {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+}
