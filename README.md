@@ -104,10 +104,11 @@ voefen/
   .firebaserc           # project id: voefen
   public/
     index.html          # screens: home, crew, workout, done
-    styles.css          # TV-first layout
+    styles.css          # TV-first layout (flex-first rows)
     crew.css            # crew editor styles
+    polish.css          # focus glow, motion, ambient wash, idle/fullscreen toast
     app.js              # screens, workout flow, glue
-    timer.js            # deadline countdown (setInterval + Date.now)
+    timer.js            # deadline countdown (setTimeout + Date.now)
     crew.js             # crew model, localStorage, editor UI
     remote-nav.js       # D-pad spatial focus + remote keys
     audio.js            # beeps (Web Audio)

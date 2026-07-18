@@ -97,17 +97,77 @@
   box-shadow: 0 0 0 4px rgba(255, 229, 102, 0.3);
 }
 
-.crew-color {
-  width: 2.7em;
-  min-width: 2.7em;
-  height: 2.7em;
-  min-height: 2.7em;
+/*
+ * Colour control: the BUTTON stays transparent (TV pointer :hover paints
+ * buttons dark). The actual colour is an INNER .crew-color-fill span.
+ */
+button.crew-color,
+button.crew-color:hover,
+button.crew-color:focus,
+button.crew-color:active,
+button.crew-color:focus-visible {
+  position: relative;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  width: 2.9em;
+  min-width: 2.9em;
+  height: 2.9em;
+  min-height: 2.9em;
   padding: 0;
   border-radius: 50%;
   flex-shrink: 0;
-  background: var(--chip-color, var(--sky));
-  border: 3px solid rgba(255, 255, 255, 0.35);
-  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.2);
+  /* Force transparent chrome — defeats global button:hover dark fill */
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 3px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    border-color 0.12s ease;
+}
+
+button.crew-color:hover,
+button.crew-color:focus,
+button.crew-color:active,
+button.crew-color:focus-visible {
+  border-color: #ffe566;
+  box-shadow:
+    0 0 0 4px rgba(255, 229, 102, 0.55),
+    0 0 22px rgba(255, 229, 102, 0.35);
+  transform: scale(1.12);
+  z-index: 2;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* The visible colour disc (not a button — never gets :hover dark paint) */
+button.crew-color .crew-color-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  /* fallback before JS paints */
+  background: #5ec8ff;
+  background-color: #5ec8ff;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+}
+
+/* Focus marker sits on top of the colour fill */
+button.crew-color:focus .crew-color-fill,
+button.crew-color:focus-visible .crew-color-fill {
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.15),
+    inset 0 0 0 0.35em rgba(255, 255, 255, 0.35);
 }
 
 .crew-remove {

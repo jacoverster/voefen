@@ -37,6 +37,18 @@
   box-sizing: border-box;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 html {
   width: 100%;
   height: 100%;
@@ -371,29 +383,56 @@ button.family-chip:focus {
   min-height: 0;
 }
 
+/*
+ * Flex-first row (NOT CSS Grid). Samsung Tizen browser often ignores
+ * display:grid / grid-template-columns, which stacks cards vertically.
+ */
 .workout-picker {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 12px;
-  gap: clamp(8px, 1vw, 14px);
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+  -webkit-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  -webkit-align-content: flex-start;
+  align-content: flex-start;
+  width: 100%;
+  margin: 0;
 }
 
 .workout-card {
+  display: -webkit-box;
+  display: -webkit-flex;
   display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
   flex-direction: column;
+  -webkit-box-align: start;
+  -webkit-align-items: flex-start;
   align-items: flex-start;
   text-align: left;
-  gap: 0.15em;
+  /* Five across on TV / desktop; % widths work without grid or gap */
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 0 19%;
+  flex: 0 0 19%;
+  width: 19%;
+  max-width: 19%;
   min-width: 0;
-  width: 100%;
-  padding: 0.75em 0.9em;
-  padding: clamp(0.6em, 1.3vh, 0.95em) 0.9em;
+  box-sizing: border-box;
+  padding: 0.7em 0.75em;
+  padding: clamp(0.55em, 1.2vh, 0.9em) 0.75em;
   border-radius: var(--radius-sm);
   border: 3px solid rgba(255, 255, 255, 0.12);
   background: var(--bg-card-solid);
   min-height: 5em;
-  margin: 0;
-  box-sizing: border-box;
+  margin: 0 0 10px;
 }
 
 .workout-card .w-emoji {
@@ -477,12 +516,66 @@ button.family-chip:focus {
 }
 
 .top-bar {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
   align-items: center;
-  gap: 0.85em;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
   flex-shrink: 0;
   width: 100%;
+}
+
+.top-bar .block-pill {
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 0 auto;
+  flex: 0 0 auto;
+  margin-right: 12px;
+}
+
+.workout-crew {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  gap: 0.3em;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.workout-crew-chip {
+  width: 2em;
+  height: 2em;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid;
+  border-radius: 50%;
+  background: var(--bg-card-solid);
+  font-size: 0.85em;
+  line-height: 1;
+}
+
+.top-bar .progress-wrap {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1 1 auto;
+  flex: 1 1 auto;
+  margin: 0 12px;
+}
+
+.top-bar .elapsed-text {
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 0 auto;
+  flex: 0 0 auto;
+  margin-left: 12px;
 }
 
 .block-pill {
@@ -543,11 +636,19 @@ button.family-chip:focus {
 }
 
 .workout-main {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1 1 auto;
   flex: 1 1 auto;
-  display: grid;
-  grid-template-columns: 1.15fr 0.95fr;
-  gap: 18px;
-  gap: clamp(12px, 1.6vw, 28px);
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-align: stretch;
+  -webkit-align-items: stretch;
+  align-items: stretch;
   min-height: 0;
   overflow: hidden;
   width: 100%;
@@ -559,15 +660,43 @@ button.family-chip:focus {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
+  display: -webkit-box;
+  display: -webkit-flex;
   display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
   flex-direction: column;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
   align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
   justify-content: center;
   padding: 18px 22px;
   padding: clamp(12px, 1.8vh, 28px) clamp(14px, 1.6vw, 28px);
   position: relative;
   overflow: hidden;
   min-height: 0;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* Side-by-side stage + timer without grid */
+.workout-main > .stage {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1 1 54%;
+  flex: 1 1 54%;
+  width: 54%;
+  margin-right: 14px;
+}
+
+.workout-main > .timer-panel {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1 1 42%;
+  flex: 1 1 42%;
+  width: 42%;
+  margin-right: 0;
 }
 
 .stage {
@@ -577,6 +706,11 @@ button.family-chip:focus {
 .stage.rest-mode {
   background: rgba(139, 147, 167, 0.12);
   border-color: rgba(139, 147, 167, 0.35);
+}
+
+.stage.ready-mode {
+  background: rgba(255, 229, 102, 0.08);
+  border-color: rgba(255, 229, 102, 0.35);
 }
 
 .stage.break-mode {
@@ -648,6 +782,11 @@ button.family-chip:focus {
 .phase-pill.work {
   color: #0f0a14;
   background: var(--accent);
+}
+
+.phase-pill.ready {
+  color: #0f0a14;
+  background: var(--focus);
 }
 
 .phase-pill.rest {
@@ -738,21 +877,34 @@ button.family-chip:focus {
 }
 
 .tips {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  gap: clamp(8px, 1.2vw, 16px);
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+  flex-direction: row;
   flex-shrink: 0;
   width: 100%;
 }
 
 .tip {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1 1 48%;
+  flex: 1 1 48%;
+  width: 48%;
+  box-sizing: border-box;
   border-radius: var(--radius-sm);
   padding: 0.7em 1.05em;
   padding: clamp(0.55em, 1.2vh, 0.95em) clamp(0.8em, 1.3vw, 1.2em);
   background: var(--bg-card);
   border: 2px solid transparent;
   min-height: 0;
+  min-width: 0;
+}
+
+.tips .tip.easy {
+  margin-right: 12px;
 }
 
 .tip.easy {
@@ -885,23 +1037,27 @@ button.family-chip:focus {
 
 /* ---------- Responsive ---------- */
 
+/* Prefer landscape / wide as default TV layout. Only tighten when narrow. */
+
 @media (max-width: 1100px) {
-  .workout-picker {
-    grid-template-columns: repeat(3, 1fr);
+  .workout-card {
+    -webkit-flex: 0 0 32%;
+    flex: 0 0 32%;
+    width: 32%;
+    max-width: 32%;
   }
 }
 
-@media (max-width: 900px) {
-  .workout-picker {
-    grid-template-columns: repeat(2, 1fr);
+@media (max-width: 720px) {
+  .workout-card {
+    -webkit-flex: 0 0 48%;
+    flex: 0 0 48%;
+    width: 48%;
+    max-width: 48%;
   }
 }
 
 @media (max-width: 900px), (max-aspect-ratio: 4/3) {
-  .workout-main {
-    grid-template-columns: 1fr 1fr;
-  }
-
   .timer-ring {
     width: 170px;
     height: 170px;
@@ -923,13 +1079,65 @@ button.family-chip:focus {
     font-size: clamp(2.3rem, 7vh, 4.5rem);
   }
 
-  .top-bar {
-    grid-template-columns: 1fr auto;
-  }
-
   .elapsed-text {
     display: none;
   }
+}
+
+/* Force a wide living-room layout when the viewport is landscape (typical TV) */
+@media (min-width: 1000px), (orientation: landscape) and (min-width: 800px) {
+  .workout-card {
+    -webkit-flex: 0 0 19%;
+    flex: 0 0 19%;
+    width: 19%;
+    max-width: 19%;
+  }
+
+  .workout-main > .stage {
+    -webkit-flex: 1 1 54%;
+    flex: 1 1 54%;
+    width: 54%;
+  }
+
+  .workout-main > .timer-panel {
+    -webkit-flex: 1 1 42%;
+    flex: 1 1 42%;
+    width: 42%;
+  }
+}
+
+/*
+ * JS adds .is-tv-wide on landscape / large panels even if the browser
+ * mis-reports width (common on Samsung Internet for TVs).
+ */
+html.is-tv-wide .workout-card {
+  -webkit-flex: 0 0 19% !important;
+  flex: 0 0 19% !important;
+  width: 19% !important;
+  max-width: 19% !important;
+}
+
+html.is-tv-wide .workout-main {
+  -webkit-flex-direction: row !important;
+  flex-direction: row !important;
+}
+
+html.is-tv-wide .workout-main > .stage {
+  -webkit-flex: 1 1 54% !important;
+  flex: 1 1 54% !important;
+  width: 54% !important;
+  margin-right: 14px !important;
+}
+
+html.is-tv-wide .workout-main > .timer-panel {
+  -webkit-flex: 1 1 42% !important;
+  flex: 1 1 42% !important;
+  width: 42% !important;
+}
+
+html.is-tv-wide .tips {
+  -webkit-flex-direction: row !important;
+  flex-direction: row !important;
 }
 
 @media (max-height: 720px) {

@@ -1,0 +1,514 @@
+/* =========================================================
+   Voefen polish — TV focus, motion, cinematic wash
+   ========================================================= */
+
+/* Cinematic ambient wash (phase-tinted via --wash) */
+body {
+  --wash: rgba(255, 107, 74, 0.2);
+  --wash-2: rgba(94, 200, 255, 0.1);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 85% 55% at 50% -10%, var(--wash), transparent 58%),
+    radial-gradient(ellipse 45% 40% at 100% 85%, var(--wash-2), transparent 55%),
+    radial-gradient(ellipse 40% 35% at 0% 100%, rgba(167, 139, 250, 0.12), transparent 50%);
+  -webkit-transition: background 0.7s ease;
+  transition: background 0.7s ease;
+  -webkit-animation: wash-drift 18s ease-in-out infinite alternate;
+  animation: wash-drift 18s ease-in-out infinite alternate;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 70% 60% at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.35) 100%);
+  opacity: 0.85;
+}
+
+@-webkit-keyframes wash-drift {
+  0% {
+    -webkit-transform: scale(1) translate(0, 0);
+    transform: scale(1) translate(0, 0);
+  }
+  100% {
+    -webkit-transform: scale(1.06) translate(1.5%, -1%);
+    transform: scale(1.06) translate(1.5%, -1%);
+  }
+}
+
+@keyframes wash-drift {
+  0% {
+    transform: scale(1) translate(0, 0);
+  }
+  100% {
+    transform: scale(1.06) translate(1.5%, -1%);
+  }
+}
+
+body[data-phase="work"] {
+  --wash: rgba(255, 107, 74, 0.28);
+  --wash-2: rgba(255, 176, 32, 0.12);
+}
+
+body[data-phase="ready"] {
+  --wash: rgba(255, 229, 102, 0.2);
+  --wash-2: rgba(255, 107, 74, 0.1);
+}
+
+body[data-phase="rest"] {
+  --wash: rgba(139, 147, 167, 0.22);
+  --wash-2: rgba(94, 200, 255, 0.08);
+}
+
+body[data-phase="break"] {
+  --wash: rgba(34, 211, 238, 0.2);
+  --wash-2: rgba(94, 200, 255, 0.14);
+}
+
+body[data-phase="cooldown"] {
+  --wash: rgba(61, 214, 140, 0.22);
+  --wash-2: rgba(94, 200, 255, 0.1);
+}
+
+body[data-phase="home"],
+body[data-phase="done"] {
+  --wash: rgba(255, 107, 74, 0.18);
+  --wash-2: rgba(167, 139, 250, 0.12);
+}
+
+/* Keep UI above ambient layers */
+.screen {
+  z-index: 1;
+}
+
+/* ---------- Focus: living-room scale ---------- */
+
+button:focus {
+  border-color: var(--focus);
+  box-shadow:
+    0 0 0 5px rgba(255, 229, 102, 0.5),
+    0 0 28px rgba(255, 229, 102, 0.25),
+    var(--shadow);
+  transform: scale(1.06);
+}
+
+html.is-tv-wide button:focus,
+body.using-dpad button:focus {
+  box-shadow:
+    0 0 0 7px rgba(255, 229, 102, 0.55),
+    0 0 40px rgba(255, 229, 102, 0.4),
+    0 12px 36px rgba(0, 0, 0, 0.45);
+  transform: scale(1.08);
+}
+
+html.is-tv-wide .workout-card:focus,
+body.using-dpad .workout-card:focus {
+  transform: scale(1.05);
+  border-color: var(--focus);
+  box-shadow:
+    0 0 0 5px rgba(255, 229, 102, 0.45),
+    0 0 28px rgba(255, 107, 74, 0.25);
+  z-index: 3;
+}
+
+html.is-tv-wide button.primary:focus {
+  box-shadow:
+    0 0 0 7px rgba(255, 229, 102, 0.55),
+    0 0 36px rgba(255, 77, 109, 0.45),
+    0 14px 40px rgba(255, 77, 109, 0.35);
+}
+
+.crew-name:focus {
+  box-shadow: 0 0 0 5px rgba(255, 229, 102, 0.4);
+}
+
+/* Crew colour: transparent button chrome; colour is on inner .crew-color-fill */
+html.is-tv-wide button.crew-color:focus,
+html.is-tv-wide button.crew-color:hover,
+body.using-dpad button.crew-color:focus,
+button.crew-color:focus,
+button.crew-color:hover {
+  background: transparent !important;
+  background-color: transparent !important;
+  transform: scale(1.14);
+  box-shadow:
+    0 0 0 5px rgba(255, 229, 102, 0.55),
+    0 0 28px rgba(255, 229, 102, 0.35) !important;
+}
+
+/* ---------- Typography hierarchy (workout) ---------- */
+
+.exercise-name {
+  font-size: 2.5rem;
+  font-size: clamp(1.7rem, 6vh, 3.4rem);
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+}
+
+.exercise-cue {
+  font-size: 0.95em;
+  font-size: clamp(0.88em, 2vh, 1.05em);
+  font-weight: 700;
+  opacity: 0.9;
+  max-width: 20em;
+}
+
+.timer-digits {
+  font-size: 5rem;
+  font-size: clamp(3rem, 12vh, 6.5rem);
+  text-shadow: 0 6px 28px rgba(0, 0, 0, 0.4);
+}
+
+.timer-panel .phase-pill {
+  font-size: 1em;
+  letter-spacing: 0.14em;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.next-preview {
+  font-size: 1em;
+  font-size: clamp(0.92em, 2vh, 1.1em);
+  padding: 0.35em 0.85em;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  min-width: 60%;
+  max-width: 95%;
+}
+
+/* ---------- Motion ---------- */
+
+.timer-ring {
+  -webkit-transition: box-shadow 0.35s ease, transform 0.35s ease;
+  transition: box-shadow 0.35s ease, transform 0.35s ease;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 16px 40px rgba(0, 0, 0, 0.35);
+}
+
+.timer-ring.is-urgent {
+  box-shadow:
+    0 0 0 3px rgba(255, 229, 102, 0.45),
+    0 0 36px rgba(255, 229, 102, 0.3),
+    0 16px 40px rgba(0, 0, 0, 0.35);
+  -webkit-transform: scale(1.03);
+  transform: scale(1.03);
+}
+
+.timer-digits {
+  -webkit-transition: color 0.2s ease, transform 0.2s ease;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.stage {
+  -webkit-transition:
+    background 0.45s ease,
+    border-color 0.45s ease,
+    opacity 0.35s ease,
+    -webkit-transform 0.35s ease;
+  transition:
+    background 0.45s ease,
+    border-color 0.45s ease,
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+
+.stage.step-enter .emoji-stage,
+.stage.step-enter .exercise-name,
+.stage.step-enter .exercise-cue {
+  -webkit-animation: step-in 0.4s ease both;
+  animation: step-in 0.4s ease both;
+}
+
+.stage.step-enter .exercise-name {
+  -webkit-animation-delay: 0.05s;
+  animation-delay: 0.05s;
+}
+
+.stage.step-enter .exercise-cue {
+  -webkit-animation-delay: 0.1s;
+  animation-delay: 0.1s;
+}
+
+@-webkit-keyframes step-in {
+  from {
+    opacity: 0;
+    -webkit-transform: translateY(12px) scale(0.96);
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    -webkit-transform: translateY(0) scale(1);
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Rest / break: dim stage slightly for a calmer room */
+.stage.rest-mode {
+  opacity: 0.92;
+  background: rgba(139, 147, 167, 0.16);
+}
+
+.stage.break-mode {
+  opacity: 0.95;
+}
+
+#screen-workout.is-resting .timer-panel {
+  opacity: 0.95;
+}
+
+#screen-workout.is-resting .tips {
+  opacity: 0.55;
+}
+
+.block-pill {
+  -webkit-transition: background 0.4s ease, box-shadow 0.3s ease;
+  transition: background 0.4s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.progress-fill {
+  -webkit-transition: width 0.45s ease;
+  transition: width 0.45s ease;
+}
+
+.emoji-stage {
+  -webkit-transition: border-color 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
+  transition: border-color 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+}
+
+/* ---------- Cards: subtle depth ---------- */
+
+.workout-card {
+  -webkit-transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.workout-card[aria-selected="true"] {
+  box-shadow:
+    0 0 0 2px rgba(255, 107, 74, 0.35),
+    0 10px 28px rgba(255, 107, 74, 0.18);
+}
+
+.team-card,
+.stage,
+.timer-panel,
+.tip {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* ---------- Home idle ambient ---------- */
+
+.home-idle-veil {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 30;
+  background: rgba(8, 5, 12, 0.55);
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  text-align: center;
+  cursor: pointer;
+}
+
+body.home-idle .home-idle-veil {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+}
+
+body.home-idle #screen-home .home-shell {
+  -webkit-filter: blur(2px);
+  filter: blur(2px);
+  opacity: 0.55;
+  -webkit-transition: opacity 0.6s ease, -webkit-filter 0.6s ease;
+  transition: opacity 0.6s ease, filter 0.6s ease;
+}
+
+.home-idle-mark {
+  font-size: 3.5rem;
+  font-size: clamp(2.5rem, 8vh, 4.5rem);
+  line-height: 1;
+  margin-bottom: 0.35em;
+  -webkit-animation: idle-float 3.2s ease-in-out infinite;
+  animation: idle-float 3.2s ease-in-out infinite;
+}
+
+.home-idle-title {
+  margin: 0;
+  font-size: 1.6rem;
+  font-size: clamp(1.3rem, 4vh, 2rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.home-idle-sub {
+  margin: 0.4em 0 0;
+  color: var(--text-dim);
+  font-weight: 700;
+  font-size: 1em;
+}
+
+@-webkit-keyframes idle-float {
+  0%,
+  100% {
+    -webkit-transform: translateY(0);
+    transform: translateY(0);
+  }
+  50% {
+    -webkit-transform: translateY(-10px);
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes idle-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+body.home-idle .family-chip .badge {
+  -webkit-animation: chip-bob 2.8s ease-in-out infinite;
+  animation: chip-bob 2.8s ease-in-out infinite;
+}
+
+body.home-idle .family-chip:nth-child(2) .badge {
+  -webkit-animation-delay: 0.2s;
+  animation-delay: 0.2s;
+}
+
+body.home-idle .family-chip:nth-child(3) .badge {
+  -webkit-animation-delay: 0.4s;
+  animation-delay: 0.4s;
+}
+
+body.home-idle .family-chip:nth-child(4) .badge {
+  -webkit-animation-delay: 0.6s;
+  animation-delay: 0.6s;
+}
+
+body.home-idle .family-chip:nth-child(5) .badge {
+  -webkit-animation-delay: 0.8s;
+  animation-delay: 0.8s;
+}
+
+@-webkit-keyframes chip-bob {
+  0%,
+  100% {
+    -webkit-transform: translateY(0);
+    transform: translateY(0);
+  }
+  50% {
+    -webkit-transform: translateY(-6px);
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes chip-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+/* Done screen polish */
+#screen-done .confetti {
+  -webkit-animation: confetti-pop 0.7s ease both;
+  animation: confetti-pop 0.7s ease both;
+}
+
+@-webkit-keyframes confetti-pop {
+  from {
+    opacity: 0;
+    -webkit-transform: scale(0.7);
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 1;
+    -webkit-transform: scale(1);
+    transform: scale(1);
+  }
+}
+
+@keyframes confetti-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  .stage.step-enter .emoji-stage,
+  .stage.step-enter .exercise-name,
+  .stage.step-enter .exercise-cue,
+  .home-idle-mark,
+  body.home-idle .family-chip .badge,
+  #screen-done .confetti {
+    -webkit-animation: none !important;
+    animation: none !important;
+  }
+
+  body::before,
+  .stage,
+  .timer-ring,
+  .timer-digits,
+  .block-pill,
+  .emoji-stage {
+    -webkit-transition: none !important;
+    transition: none !important;
+  }
+}

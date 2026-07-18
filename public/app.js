@@ -7,6 +7,23 @@
   const Nav = window.VoefenRemoteNav;
   const workouts = window.WORKOUTS || [];
 
+  // Samsung TV browsers sometimes report a narrow CSS width while the panel
+  // is landscape. Force the wide layout class so workout cards stay in a row.
+  function applyTvLayoutClass() {
+    try {
+      var w = window.innerWidth || document.documentElement.clientWidth || 0;
+      var h = window.innerHeight || document.documentElement.clientHeight || 0;
+      var landscape = h > 0 && w / h >= 1.15;
+      var wide = w >= 900 || landscape;
+      document.documentElement.classList.toggle("is-tv-wide", wide);
+    } catch (_) {
+      /* ignore */
+    }
+  }
+  applyTvLayoutClass();
+  window.addEventListener("resize", applyTvLayoutClass);
+  window.addEventListener("orientationchange", applyTvLayoutClass);
+
   const $ = function (id) {
     return document.getElementById(id);
   };
@@ -35,6 +52,8 @@
     btnCrewReset: $("btn-crew-reset"),
     btnCrewDone: $("btn-crew-done"),
     blockLabel: $("block-label"),
+    workoutCrew: $("workout-crew"),
+    workoutAnnouncer: $("workout-announcer"),
     progressFill: $("progress-fill"),
     progressText: $("progress-text"),
     elapsedText: $("elapsed-text"),
@@ -60,6 +79,7 @@
     btnHome: $("btn-home"),
     doneStats: $("done-stats"),
     doneFamily: $("done-family"),
+    homeIdleVeil: $("home-idle-veil"),
   };
 
   let selectedId = null;
@@ -70,6 +90,10 @@
   let lastTickSecond = null;
   let endArmedUntil = 0;
 
+  /** Home idle ambient */
+  const IDLE_MS = 50000;
+  let idleTimer = null;
+
   function activeScreen() {
     for (const name in screens) {
       if (screens[name] && screens[name].classList.contains("active")) return name;
@@ -77,9 +101,60 @@
     return "home";
   }
 
+  function setPhase(phase) {
+    try {
+      document.body.setAttribute("data-phase", phase || "home");
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  function clearHomeIdle() {
+    document.body.classList.remove("home-idle");
+    if (els.homeIdleVeil) {
+      els.homeIdleVeil.hidden = true;
+    }
+  }
+
+  function enterHomeIdle() {
+    if (activeScreen() !== "home") return;
+    document.body.classList.add("home-idle");
+    if (els.homeIdleVeil) {
+      els.homeIdleVeil.hidden = false;
+    }
+  }
+
+  function bumpIdle() {
+    clearHomeIdle();
+    if (idleTimer) {
+      clearTimeout(idleTimer);
+      idleTimer = null;
+    }
+    if (activeScreen() !== "home") return;
+    idleTimer = setTimeout(enterHomeIdle, IDLE_MS);
+  }
+
+  function isFullscreen() {
+    const doc = document;
+    return !!(doc.fullscreenElement || doc.webkitFullscreenElement);
+  }
+
   function showScreen(name) {
     for (const key in screens) {
       if (screens[key]) screens[key].classList.toggle("active", key === name);
+    }
+
+    if (name === "home") {
+      setPhase("home");
+      bumpIdle();
+    } else {
+      clearHomeIdle();
+      if (idleTimer) {
+        clearTimeout(idleTimer);
+        idleTimer = null;
+      }
+      if (name === "done") setPhase("done");
+      else if (name === "crew") setPhase("home");
     }
 
     // Delay Pause focus so remote OK keyup does not immediately pause
@@ -87,8 +162,9 @@
     setTimeout(function () {
       if (activeScreen() !== name) return;
       try {
-        if (name === "home") Nav.focus(els.btnStart);
-        else if (name === "crew") {
+        if (name === "home") {
+          Nav.focus(els.btnStart);
+        } else if (name === "crew") {
           const first =
             els.crewList && els.crewList.querySelector("input, button");
           Nav.focus(first || els.btnCrewDone);
@@ -256,6 +332,7 @@
     const whole = Math.ceil(secs);
     const urgent = whole <= 3 && whole > 0 && !state.paused;
     els.timerDigits.classList.toggle("urgent", urgent);
+    if (els.timerRing) els.timerRing.classList.toggle("is-urgent", urgent);
     if (urgent && lastTickSecond !== whole) {
       lastTickSecond = whole;
       safeAudio(function () {
@@ -268,6 +345,48 @@
     }
   }
 
+  function pulseStageEnter() {
+    if (!els.stage) return;
+    els.stage.classList.remove("step-enter");
+    // Force reflow so the animation restarts on each step
+    void els.stage.offsetWidth;
+    els.stage.classList.add("step-enter");
+  }
+
+  function renderWorkoutCrew() {
+    if (!els.workoutCrew) return;
+    els.workoutCrew.textContent = "";
+    Crew.list().forEach(function (person) {
+      const chip = document.createElement("span");
+      chip.className = "workout-crew-chip";
+      chip.textContent = person.emoji;
+      chip.title = person.label;
+      chip.style.borderColor = person.color;
+      els.workoutCrew.appendChild(chip);
+    });
+  }
+
+  function blockExerciseCount(blockId) {
+    let count = 0;
+    for (let i = 0; i < playlist.length; i++) {
+      if (playlist[i].type === "exercise" && playlist[i].blockId === blockId) count++;
+    }
+    return count;
+  }
+
+  function progressLabel(step) {
+    if (step.type === "ready") return "Starting together";
+    if (step.blockKind === "break") return "Water break";
+    if (step.type === "rest") return step.blockName + " · Rest";
+    return (
+      step.blockName +
+      " · " +
+      (step.stepIndex + 1) +
+      " of " +
+      blockExerciseCount(step.blockId)
+    );
+  }
+
   function renderStep() {
     const step = playlist[index];
     if (!step) {
@@ -276,6 +395,7 @@
     }
 
     const isRest = step.type === "rest";
+    const isReady = step.type === "ready";
     const isBreak = step.blockKind === "break";
     const isCooldown = step.blockKind === "cooldown";
 
@@ -285,31 +405,45 @@
       isRest ? "#8b93a7" : step.blockColor
     );
 
+    let label = "Work";
+    let labelClass = "work";
+    let phase = "work";
+    if (isReady) {
+      label = "Ready";
+      labelClass = "ready";
+      phase = "ready";
+    } else if (isRest) {
+      label = "Rest";
+      labelClass = "rest";
+      phase = "rest";
+    } else if (isBreak) {
+      label = "Break";
+      labelClass = "break";
+      phase = "break";
+    } else if (isCooldown) {
+      label = "Stretch";
+      labelClass = "cooldown";
+      phase = "cooldown";
+    }
+    setPhase(phase);
+
     els.blockLabel.textContent = step.blockName;
     els.exerciseName.textContent = step.name;
     els.exerciseCue.textContent = step.cue || "";
     els.iconWrap.textContent = isRest ? "😌" : step.emoji || "💪";
 
     els.stage.classList.toggle("rest-mode", isRest);
+    els.stage.classList.toggle("ready-mode", isReady);
     els.stage.classList.toggle("break-mode", isBreak && !isRest);
     els.stage.classList.toggle("cooldown-mode", isCooldown && !isRest);
-
-    let label = "Work";
-    let labelClass = "work";
-    if (isRest) {
-      label = "Rest";
-      labelClass = "rest";
-    } else if (isBreak) {
-      label = "Break";
-      labelClass = "break";
-    } else if (isCooldown) {
-      label = "Stretch";
-      labelClass = "cooldown";
+    if (screens.workout) {
+      screens.workout.classList.toggle("is-resting", isRest || isBreak);
     }
+
     els.timerLabel.textContent = label;
     els.timerLabel.className = "phase-pill " + labelClass;
 
-    if (isRest || !step.easy) {
+    if (isReady || isRest || !step.easy) {
       els.tipEasy.classList.add("hidden");
       els.tipHard.classList.add("hidden");
     } else {
@@ -320,7 +454,9 @@
     }
 
     const next = playlist[index + 1];
-    if (isRest && step.nextName) {
+    if (isReady && step.nextName) {
+      els.nextPreview.innerHTML = "First: <strong>" + step.nextName + "</strong>";
+    } else if (isRest && step.nextName) {
       els.nextPreview.innerHTML =
         "Coming up: <strong>" + step.nextName + "</strong>";
     } else if (next) {
@@ -333,13 +469,22 @@
       els.nextPreview.innerHTML = "<strong>Final stretch!</strong>";
     }
 
-    els.progressFill.style.width = (index / playlist.length) * 100 + "%";
-    els.progressText.textContent = index + 1 + " / " + playlist.length;
+    const workoutIndex = Math.max(0, index - 1);
+    const workoutLength = Math.max(1, playlist.length - 1);
+    els.progressFill.style.width = (workoutIndex / workoutLength) * 100 + "%";
+    els.progressText.textContent = progressLabel(step);
+    if (els.workoutAnnouncer) {
+      els.workoutAnnouncer.textContent =
+        step.blockName + ". " + step.name + ". " + (step.cue || "");
+    }
+
+    pulseStageEnter();
 
     lastTickSecond = null;
     Timer.armStep(step.seconds);
 
     safeAudio(function () {
+      if (isReady) return;
       if (isRest || isBreak) Audio.restStart();
       else Audio.workStart();
     });
@@ -372,6 +517,24 @@
     totalWorkSeconds = built.totalWorkSeconds;
     if (!playlist.length) return;
 
+    const first = playlist[0];
+    playlist.unshift({
+      type: "ready",
+      blockId: "ready",
+      blockName: "Starting Together",
+      blockKind: "ready",
+      blockColor: "#ffe566",
+      blockIndex: -1,
+      stepIndex: 0,
+      name: "Get Ready!",
+      emoji: "✨",
+      seconds: 5,
+      cue: "Find your space. First up: " + first.name + ".",
+      easy: "",
+      hard: "",
+      nextName: first.name,
+    });
+
     safeAudio(function () {
       Audio.unlock();
     });
@@ -380,6 +543,7 @@
     lastTickSecond = null;
     Timer.resetSession();
     syncPauseUI();
+    renderWorkoutCrew();
     showScreen("workout");
     // Arm step first, then start the loop so deadline + schedule are in order
     renderStep();
@@ -458,10 +622,12 @@
 
   function toggleFullscreen() {
     const doc = document;
-    if (!doc.fullscreenElement && !doc.webkitFullscreenElement) {
+    if (!isFullscreen()) {
       const el = doc.documentElement;
       const req = el.requestFullscreen || el.webkitRequestFullscreen;
-      if (req) req.call(el).catch(function () {});
+      if (req) {
+        req.call(el).catch(function () {});
+      }
     } else {
       const exit = doc.exitFullscreen || doc.webkitExitFullscreen;
       if (exit) exit.call(doc).catch(function () {});
@@ -577,6 +743,28 @@
     showScreen("home");
   });
 
+  if (els.homeIdleVeil) {
+    els.homeIdleVeil.addEventListener("click", function () {
+      bumpIdle();
+      Nav.focus(els.btnStart);
+    });
+  }
+
+  // Wake idle ambient on any real interaction
+  ["pointerdown", "keydown", "touchstart"].forEach(function (evt) {
+    document.addEventListener(
+      evt,
+      function () {
+        if (document.body.classList.contains("home-idle")) {
+          bumpIdle();
+        } else if (activeScreen() === "home") {
+          bumpIdle();
+        }
+      },
+      true
+    );
+  });
+
   const initialId = loadSelectedId() || (workouts[0] && workouts[0].id);
   selectWorkout(initialId);
   renderWorkoutPicker();
@@ -584,6 +772,8 @@
   updateHomeMeta();
   els.btnBeeps.dataset.label = "Beeps";
   syncToggles();
+  setPhase("home");
+  bumpIdle();
 
   console.info(
     "Voefen ready — " +

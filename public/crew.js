@@ -165,9 +165,11 @@ window.VoefenCrew = (function () {
           '" autocomplete="off" spellcheck="false" />' +
           '<button type="button" class="crew-color" data-action="color" data-id="' +
           escapeHtml(p.id) +
-          '" style="--chip-color:' +
-          p.color +
-          '" aria-label="Change colour"></button>' +
+          '" data-color="' +
+          escapeHtml(p.color) +
+          '" title="Colour" aria-label="Change colour for ' +
+          escapeHtml(p.label) +
+          '"><span class="crew-color-fill" aria-hidden="true"></span></button>' +
           '<button type="button" class="crew-remove ghost quiet" data-action="remove" data-id="' +
           escapeHtml(p.id) +
           '"' +
@@ -176,7 +178,30 @@ window.VoefenCrew = (function () {
         );
       })
       .join("");
+    // Paint fills after insert (colour lives on inner span, not the button)
+    var swatches = ui.crewList.querySelectorAll("button.crew-color");
+    for (var s = 0; s < swatches.length; s++) {
+      paintColorSwatch(swatches[s], swatches[s].getAttribute("data-color"));
+    }
     if (ui.btnAdd) ui.btnAdd.disabled = members.length >= MAX_CREW;
+  }
+
+  /**
+   * Colour lives on an INNER span so TV pointer :hover on the <button>
+   * (global dark button chrome) never hides the chosen colour.
+   */
+  function paintColorSwatch(btn, color) {
+    if (!btn || !color) return;
+    btn.setAttribute("data-color", color);
+    var fill = btn.querySelector(".crew-color-fill");
+    if (!fill) {
+      fill = document.createElement("span");
+      fill.className = "crew-color-fill";
+      fill.setAttribute("aria-hidden", "true");
+      btn.appendChild(fill);
+    }
+    fill.style.background = color;
+    fill.style.backgroundColor = color;
   }
 
   function onListClick(e) {
@@ -194,7 +219,7 @@ window.VoefenCrew = (function () {
     }
     if (action === "color") {
       person.color = cycle(COLORS, person.color);
-      btn.style.setProperty("--chip-color", person.color);
+      paintColorSwatch(btn, person.color);
       save();
       return;
     }
