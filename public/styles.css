@@ -1,5 +1,8 @@
 /* =========================================================
    Voefen — Living-room coach (TV-first)
+   Always put a solid value BEFORE clamp()/dvh so older Tizen
+   browsers still get usable type and spacing.
+   Screens use top/right/bottom/left (not inset alone).
    ========================================================= */
 
 :root {
@@ -20,9 +23,10 @@
   --radius-sm: 14px;
   --shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
   --font: "Nunito", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
-  /* Prefer vh so short TV/browser chrome still fits */
-  --safe-pad-x: clamp(12px, 2.5vw, 40px);
-  --safe-pad-y: clamp(8px, 1.5vh, 28px);
+  --safe-pad-x: 28px;
+  --safe-pad-x: clamp(16px, 2.5vw, 48px);
+  --safe-pad-y: 18px;
+  --safe-pad-y: clamp(10px, 1.8vh, 32px);
   --block-color: var(--sky);
   --timer-color: var(--accent);
 }
@@ -33,18 +37,29 @@
   box-sizing: border-box;
 }
 
+html {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 html,
 body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
+  height: 100vh;
   height: 100dvh;
+  max-height: 100%;
+  max-height: 100vh;
   max-height: 100dvh;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font);
-  font-size: clamp(15px, 1.6vh + 0.4vw, 24px);
+  font-size: 22px;
+  font-size: clamp(17px, 1.9vh + 0.5vw, 28px);
   line-height: 1.3;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
@@ -53,6 +68,9 @@ body {
 }
 
 body {
+  position: relative;
+  min-height: 100%;
+  min-height: 100vh;
   background:
     radial-gradient(ellipse 90% 55% at 50% -15%, rgba(255, 107, 74, 0.22), transparent 55%),
     radial-gradient(ellipse 50% 45% at 100% 80%, rgba(94, 200, 255, 0.12), transparent 50%),
@@ -70,8 +88,9 @@ button {
   border: 3px solid transparent;
   background: var(--bg-card-solid);
   border-radius: 999px;
-  padding: 0.45em 1.15em;
-  min-height: 2.35em;
+  padding: 0.5em 1.25em;
+  min-height: 2.6em;
+  min-width: 5.5em;
   transition:
     transform 0.12s ease,
     border-color 0.12s ease,
@@ -85,12 +104,18 @@ button:hover {
 
 button:focus {
   outline: none;
+  border-color: var(--focus);
+  box-shadow: 0 0 0 5px rgba(255, 229, 102, 0.45), var(--shadow);
+  transform: scale(1.05);
+  z-index: 2;
+  position: relative;
 }
 
-button:focus-visible {
-  border-color: var(--focus);
-  box-shadow: 0 0 0 4px rgba(255, 229, 102, 0.35), var(--shadow);
-  transform: scale(1.04);
+body.using-dpad button:focus {
+  box-shadow:
+    0 0 0 6px rgba(255, 229, 102, 0.55),
+    0 0 24px rgba(255, 229, 102, 0.35),
+    var(--shadow);
 }
 
 button.primary {
@@ -103,10 +128,17 @@ button.primary:hover {
 }
 
 button.btn-xl {
-  font-size: 1.1em;
-  min-width: 9em;
-  min-height: 2.6em;
-  padding: 0.55em 1.5em;
+  font-size: 1.15em;
+  min-width: 10em;
+  min-height: 2.9em;
+  padding: 0.6em 1.6em;
+}
+
+button.btn-sm {
+  min-height: 2.1em;
+  min-width: 4em;
+  padding: 0.3em 0.9em;
+  font-size: 0.88em;
 }
 
 button.ghost {
@@ -133,11 +165,17 @@ button.toggle[aria-pressed="false"] {
 .screen {
   display: none;
   position: absolute;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   padding: var(--safe-pad-y) var(--safe-pad-x);
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .screen.active {
@@ -152,21 +190,29 @@ button.toggle[aria-pressed="false"] {
 }
 
 .home-shell {
-  width: min(1100px, 100%);
+  width: 100%;
+  max-width: 1400px;
   max-height: 100%;
   min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(6px, 1.2vh, 14px);
+  gap: 14px;
+  gap: clamp(8px, 1.4vh, 18px);
   text-align: center;
   overflow: hidden;
+  margin: 0 auto;
+}
+
+.brand {
+  flex-shrink: 0;
 }
 
 .brand-kicker {
   margin: 0;
-  font-size: clamp(0.7em, 1.6vh, 0.9em);
+  font-size: 0.88em;
+  font-size: clamp(0.78em, 1.7vh, 0.95em);
   font-weight: 800;
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -183,26 +229,36 @@ button.toggle[aria-pressed="false"] {
 }
 
 .brand-num {
-  font-size: clamp(2.2rem, 7.5vh, 5rem);
+  font-size: 4.5rem;
+  font-size: clamp(2.8rem, 9vh, 6rem);
   font-weight: 900;
   letter-spacing: -0.04em;
-  background: linear-gradient(180deg, #fff 20%, #ffc9a8 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #ffc9a8;
+}
+
+@supports (-webkit-background-clip: text) or (background-clip: text) {
+  .brand-num {
+    background: linear-gradient(180deg, #fff 20%, #ffc9a8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
 }
 
 .brand-unit {
-  font-size: clamp(1rem, 2.8vh, 1.6rem);
+  font-size: 1.5rem;
+  font-size: clamp(1.15rem, 3vh, 1.85rem);
   font-weight: 800;
   color: var(--text-dim);
   text-transform: lowercase;
 }
 
 .subtitle {
-  margin: 0.15em 0 0;
+  margin: 0.25em 0 0;
   color: var(--text-dim);
-  font-size: clamp(0.85em, 2vh, 1em);
+  font-size: 1.05em;
+  font-size: clamp(0.95em, 2.1vh, 1.15em);
   font-weight: 700;
 }
 
@@ -211,14 +267,27 @@ button.toggle[aria-pressed="false"] {
   background: var(--bg-card);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius);
-  padding: clamp(6px, 1.2vh, 12px) clamp(10px, 1.5vw, 18px);
-  box-shadow: none;
+  padding: 12px 18px;
+  padding: clamp(10px, 1.4vh, 16px) clamp(14px, 1.6vw, 22px);
   flex-shrink: 0;
 }
 
+.team-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75em;
+  margin-bottom: 0.4em;
+}
+
+.team-label-row .team-label {
+  margin: 0;
+}
+
 .team-label {
-  margin: 0 0 0.4em;
-  font-size: clamp(0.65em, 1.5vh, 0.78em);
+  margin: 0 0 0.5em;
+  font-size: 0.8em;
+  font-size: clamp(0.72em, 1.5vh, 0.85em);
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -227,47 +296,75 @@ button.toggle[aria-pressed="false"] {
 
 .family-row {
   display: flex;
-  gap: clamp(8px, 1.2vw, 16px);
-  flex-wrap: nowrap;
+  gap: 14px;
+  gap: clamp(10px, 1.4vw, 20px);
+  flex-wrap: wrap;
   justify-content: center;
+}
+
+.family-empty {
+  margin: 0.4em 0;
+  color: var(--text-dim);
+  font-weight: 700;
+  font-size: 0.95em;
 }
 
 .family-chip {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.25em;
-  min-width: 3.6em;
+  gap: 0.3em;
+  min-width: 4.2em;
+  margin: 0 4px;
+  background: transparent;
+  border: 3px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 0.35em 0.55em;
+  min-height: 0;
+  box-shadow: none;
+}
+
+button.family-chip:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+button.family-chip:focus {
+  border-color: var(--focus);
 }
 
 .family-chip .badge {
-  width: clamp(40px, 6.5vh, 68px);
-  height: clamp(40px, 6.5vh, 68px);
+  width: 60px;
+  height: 60px;
+  width: clamp(48px, 7.2vh, 78px);
+  height: clamp(48px, 7.2vh, 78px);
   border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-size: clamp(1.2rem, 3.2vh, 2.1rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.9rem;
+  font-size: clamp(1.4rem, 3.5vh, 2.35rem);
   line-height: 1;
-  background: color-mix(in srgb, var(--chip-color, var(--sky)) 22%, #1a1024);
+  background: #2a1f3d;
   border: 3px solid var(--chip-color, var(--sky));
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
 .family-chip .label {
-  font-size: clamp(0.75em, 1.8vh, 0.9em);
+  font-size: 0.9em;
+  font-size: clamp(0.8em, 1.9vh, 0.98em);
   font-weight: 800;
   color: var(--text);
 }
 
 .meta-line {
-  margin: 0;
+  margin: 0.15em 0 0;
   color: var(--text-dim);
-  font-size: clamp(0.75em, 1.7vh, 0.9em);
+  font-size: 0.9em;
+  font-size: clamp(0.8em, 1.8vh, 0.98em);
   font-weight: 700;
   flex-shrink: 0;
 }
 
-/* Workout picker — one row on wide screens */
 .workout-picker-wrap {
   width: 100%;
   flex-shrink: 0;
@@ -276,8 +373,9 @@ button.toggle[aria-pressed="false"] {
 
 .workout-picker {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: clamp(6px, 0.8vw, 10px);
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  gap: clamp(8px, 1vw, 14px);
 }
 
 .workout-card {
@@ -285,36 +383,42 @@ button.toggle[aria-pressed="false"] {
   flex-direction: column;
   align-items: flex-start;
   text-align: left;
-  gap: 0.1em;
+  gap: 0.15em;
   min-width: 0;
   width: 100%;
-  padding: clamp(0.45em, 1.1vh, 0.75em) 0.7em;
+  padding: 0.75em 0.9em;
+  padding: clamp(0.6em, 1.3vh, 0.95em) 0.9em;
   border-radius: var(--radius-sm);
   border: 3px solid rgba(255, 255, 255, 0.12);
   background: var(--bg-card-solid);
-  box-shadow: none;
-  min-height: 0;
+  min-height: 5em;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 .workout-card .w-emoji {
-  font-size: clamp(1.15em, 2.8vh, 1.5em);
+  font-size: 1.45em;
+  font-size: clamp(1.25em, 3vh, 1.7em);
   line-height: 1;
 }
 
 .workout-card .w-title {
-  font-size: clamp(0.78em, 1.9vh, 0.95em);
+  font-size: 1em;
+  font-size: clamp(0.88em, 2.1vh, 1.08em);
   font-weight: 900;
   line-height: 1.15;
 }
 
 .workout-card .w-meta {
-  font-size: clamp(0.65em, 1.5vh, 0.78em);
+  font-size: 0.82em;
+  font-size: clamp(0.72em, 1.6vh, 0.88em);
   font-weight: 700;
   color: var(--text-dim);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  line-height: 1.25;
 }
 
 .workout-card[aria-selected="true"] {
@@ -323,7 +427,7 @@ button.toggle[aria-pressed="false"] {
   box-shadow: 0 0 0 2px rgba(255, 107, 74, 0.25);
 }
 
-.workout-card:focus-visible {
+.workout-card:focus {
   border-color: var(--focus);
   box-shadow: 0 0 0 4px rgba(255, 229, 102, 0.35);
   transform: scale(1.02);
@@ -331,74 +435,66 @@ button.toggle[aria-pressed="false"] {
 
 .home-actions {
   display: flex;
-  flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 0.55em 0.75em;
+  gap: 0.7em 0.9em;
   width: 100%;
   flex-shrink: 0;
+  margin-top: 0.25em;
 }
 
 .home-secondary {
   display: flex;
-  gap: 0.55em;
+  gap: 0.65em;
   flex-wrap: wrap;
   justify-content: center;
 }
 
 .settings-panel {
   display: none;
-  gap: 0.55em;
+  gap: 0.65em;
   flex-wrap: wrap;
   justify-content: center;
-  padding: 0.55em 0.9em;
+  padding: 0.7em 1em;
   background: var(--bg-card);
   border-radius: var(--radius);
   border: 1px solid rgba(255, 255, 255, 0.08);
   max-width: 36em;
   flex-shrink: 0;
+  margin-top: 0.25em;
 }
 
 .settings-panel.open {
   display: flex;
 }
 
-.hint {
-  margin: 0;
-  color: rgba(185, 168, 196, 0.75);
-  font-size: clamp(0.65em, 1.5vh, 0.78em);
-  font-weight: 600;
-  max-width: 34em;
-  flex-shrink: 0;
-}
-
 /* ---------- Workout ---------- */
 
 #screen-workout {
-  gap: clamp(6px, 1.2vh, 14px);
+  gap: 12px;
+  gap: clamp(8px, 1.3vh, 16px);
 }
 
 .top-bar {
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 0.65em;
+  gap: 0.85em;
   flex-shrink: 0;
+  width: 100%;
 }
 
 .block-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: inline-block;
   font-weight: 800;
-  font-size: 0.82em;
+  font-size: 0.88em;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #0f0a14;
   background: var(--block-color, var(--sky));
   border-radius: 999px;
-  padding: 0.4em 0.95em;
+  padding: 0.45em 1.05em;
   white-space: nowrap;
   max-width: 28vw;
   overflow: hidden;
@@ -411,11 +507,14 @@ button.toggle[aria-pressed="false"] {
   align-items: center;
   gap: 0.35em;
   min-width: 0;
+  flex: 1 1 auto;
 }
 
 .progress-track {
-  width: min(46vw, 520px);
-  height: clamp(8px, 1.2vh, 12px);
+  width: 100%;
+  max-width: 520px;
+  height: 12px;
+  height: clamp(9px, 1.3vh, 14px);
   background: rgba(255, 255, 255, 0.1);
   border-radius: 999px;
   overflow: hidden;
@@ -431,7 +530,7 @@ button.toggle[aria-pressed="false"] {
 
 .progress-text,
 .elapsed-text {
-  font-size: 0.82em;
+  font-size: 0.9em;
   font-weight: 800;
   color: var(--text-dim);
   font-variant-numeric: tabular-nums;
@@ -440,15 +539,18 @@ button.toggle[aria-pressed="false"] {
 .elapsed-text {
   min-width: 3.5em;
   text-align: right;
+  flex-shrink: 0;
 }
 
 .workout-main {
   flex: 1 1 auto;
   display: grid;
   grid-template-columns: 1.15fr 0.95fr;
-  gap: clamp(8px, 1.5vw, 20px);
+  gap: 18px;
+  gap: clamp(12px, 1.6vw, 28px);
   min-height: 0;
   overflow: hidden;
+  width: 100%;
 }
 
 .stage,
@@ -461,14 +563,15 @@ button.toggle[aria-pressed="false"] {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: clamp(8px, 1.5vh, 20px) clamp(10px, 1.5vw, 24px);
+  padding: 18px 22px;
+  padding: clamp(12px, 1.8vh, 28px) clamp(14px, 1.6vw, 28px);
   position: relative;
   overflow: hidden;
   min-height: 0;
 }
 
 .stage {
-  gap: 0.2em;
+  gap: 0.3em;
 }
 
 .stage.rest-mode {
@@ -487,23 +590,29 @@ button.toggle[aria-pressed="false"] {
 }
 
 .emoji-stage {
-  width: min(38%, 22vh, 160px);
-  aspect-ratio: 1;
+  width: 130px;
+  height: 130px;
+  width: clamp(90px, 18vh, 180px);
+  height: clamp(90px, 18vh, 180px);
+  max-width: 38%;
   max-height: 28vh;
-  display: grid;
-  place-items: center;
-  font-size: clamp(2.4rem, 9vh, 5.5rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  font-size: clamp(2.8rem, 10vh, 6rem);
   line-height: 1;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--block-color, var(--sky)) 18%, transparent);
-  border: 2px solid color-mix(in srgb, var(--block-color, var(--sky)) 45%, transparent);
-  margin-bottom: 0.15em;
+  background: rgba(94, 200, 255, 0.15);
+  border: 2px solid rgba(94, 200, 255, 0.4);
+  margin-bottom: 0.2em;
   flex-shrink: 1;
 }
 
 .exercise-name {
   margin: 0;
-  font-size: clamp(1.25rem, 4.5vh, 2.6rem);
+  font-size: 2.2rem;
+  font-size: clamp(1.5rem, 5.2vh, 3.1rem);
   font-weight: 900;
   text-align: center;
   letter-spacing: -0.02em;
@@ -511,25 +620,27 @@ button.toggle[aria-pressed="false"] {
 }
 
 .exercise-cue {
-  margin: 0.2em 0 0;
+  margin: 0.3em 0 0;
   color: var(--text-dim);
   text-align: center;
-  font-size: clamp(0.85em, 2vh, 1em);
+  font-size: 1.05em;
+  font-size: clamp(0.95em, 2.2vh, 1.15em);
   font-weight: 700;
   max-width: 22em;
 }
 
 .timer-panel {
-  gap: clamp(0.3em, 1vh, 0.65em);
+  gap: 0.55em;
+  gap: clamp(0.4em, 1.1vh, 0.8em);
 }
 
 .phase-pill {
-  font-size: 0.85em;
+  font-size: 0.95em;
   font-weight: 900;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   border-radius: 999px;
-  padding: 0.35em 0.95em;
+  padding: 0.4em 1.05em;
   background: rgba(255, 255, 255, 0.08);
   color: var(--text-dim);
 }
@@ -556,16 +667,21 @@ button.toggle[aria-pressed="false"] {
 
 .timer-ring {
   --p: 0;
-  width: min(36vw, 34vh, 260px);
-  aspect-ratio: 1;
-  max-height: 42vh;
+  width: 240px;
+  height: 240px;
+  width: clamp(170px, 34vh, 300px);
+  height: clamp(170px, 34vh, 300px);
+  max-width: 42vw;
+  max-height: 44vh;
   border-radius: 50%;
+  background: #2a2038;
   background: conic-gradient(
     var(--timer-color, var(--accent)) calc(var(--p) * 1%),
     rgba(255, 255, 255, 0.1) 0
   );
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
   flex-shrink: 1;
 }
@@ -573,7 +689,10 @@ button.toggle[aria-pressed="false"] {
 .timer-ring::before {
   content: "";
   position: absolute;
-  inset: clamp(8px, 1.5vh, 14px);
+  top: 14px;
+  right: 14px;
+  bottom: 14px;
+  left: 14px;
   border-radius: 50%;
   background: #1a1024;
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -581,7 +700,9 @@ button.toggle[aria-pressed="false"] {
 
 .timer-digits {
   position: relative;
-  font-size: clamp(2.4rem, 10vh, 5.5rem);
+  z-index: 1;
+  font-size: 4.5rem;
+  font-size: clamp(2.8rem, 11vh, 6.2rem);
   font-weight: 900;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.04em;
@@ -604,7 +725,7 @@ button.toggle[aria-pressed="false"] {
 }
 
 .next-preview {
-  font-size: 0.95em;
+  font-size: 1.05em;
   font-weight: 700;
   color: var(--text-dim);
   text-align: center;
@@ -616,17 +737,19 @@ button.toggle[aria-pressed="false"] {
   font-weight: 900;
 }
 
-/* Tips */
 .tips {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: clamp(6px, 1vw, 14px);
+  gap: 12px;
+  gap: clamp(8px, 1.2vw, 16px);
   flex-shrink: 0;
+  width: 100%;
 }
 
 .tip {
   border-radius: var(--radius-sm);
-  padding: clamp(0.45em, 1vh, 0.8em) clamp(0.7em, 1.2vw, 1.1em);
+  padding: 0.7em 1.05em;
+  padding: clamp(0.55em, 1.2vh, 0.95em) clamp(0.8em, 1.3vw, 1.2em);
   background: var(--bg-card);
   border: 2px solid transparent;
   min-height: 0;
@@ -643,7 +766,7 @@ button.toggle[aria-pressed="false"] {
 }
 
 .tip-title {
-  font-size: 0.78em;
+  font-size: 0.82em;
   font-weight: 900;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -659,7 +782,8 @@ button.toggle[aria-pressed="false"] {
 }
 
 .tip-body {
-  font-size: clamp(0.85em, 1.9vh, 0.98em);
+  font-size: 1em;
+  font-size: clamp(0.9em, 2vh, 1.08em);
   font-weight: 700;
   line-height: 1.25;
   display: -webkit-box;
@@ -674,14 +798,16 @@ button.toggle[aria-pressed="false"] {
 
 .controls {
   display: flex;
-  gap: 0.55em;
+  gap: 0.7em;
   justify-content: center;
   flex-wrap: wrap;
   flex-shrink: 0;
+  width: 100%;
 }
 
 .controls button {
-  min-width: 6.2em;
+  min-width: 6.8em;
+  margin: 0.15em;
 }
 
 .paused-banner {
@@ -694,9 +820,9 @@ button.toggle[aria-pressed="false"] {
   border: 3px solid var(--focus);
   color: var(--focus);
   font-weight: 900;
-  font-size: 1.35em;
+  font-size: 1.45em;
   letter-spacing: 0.16em;
-  padding: 0.45em 1.2em;
+  padding: 0.5em 1.35em;
   border-radius: 14px;
   z-index: 5;
 }
@@ -716,21 +842,24 @@ button.toggle[aria-pressed="false"] {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.75em;
+  gap: 0.9em;
   text-align: center;
-  max-width: 36em;
+  max-width: 42em;
+  width: 100%;
+  margin: 0 auto;
 }
 
 #screen-done h1 {
   margin: 0;
-  font-size: clamp(2.4rem, 7vw, 4.4rem);
+  font-size: 3.4rem;
+  font-size: clamp(2.6rem, 8vw, 4.8rem);
   font-weight: 900;
   letter-spacing: -0.03em;
 }
 
 .done-family {
   margin: 0;
-  font-size: 1.15em;
+  font-size: 1.25em;
   font-weight: 800;
   color: var(--accent-2);
 }
@@ -739,44 +868,59 @@ button.toggle[aria-pressed="false"] {
   margin: 0;
   color: var(--text);
   font-weight: 700;
+  font-size: 1.05em;
 }
 
 .done-sub {
-  margin: 0 0 0.4em;
+  margin: 0 0 0.5em;
   color: var(--text-dim);
   font-weight: 700;
 }
 
 .confetti {
-  font-size: clamp(2.2rem, 5.5vw, 3.6rem);
+  font-size: 3rem;
+  font-size: clamp(2.4rem, 6vw, 4rem);
   letter-spacing: 0.12em;
 }
 
 /* ---------- Responsive ---------- */
 
+@media (max-width: 1100px) {
+  .workout-picker {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (max-width: 900px) {
   .workout-picker {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 900px), (max-aspect-ratio: 4/3) {
   .workout-main {
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: minmax(0, 1fr);
   }
 
   .timer-ring {
-    width: min(40vw, 28vh, 200px);
+    width: 170px;
+    height: 170px;
+    width: clamp(130px, 26vh, 220px);
+    height: clamp(130px, 26vh, 220px);
   }
 
   .timer-digits {
-    font-size: clamp(2rem, 8vh, 4rem);
+    font-size: 3.2rem;
+    font-size: clamp(2.3rem, 8vh, 4.5rem);
   }
 
   .emoji-stage {
-    width: min(30%, 18vh, 120px);
-    font-size: clamp(2rem, 7vh, 4rem);
+    width: 100px;
+    height: 100px;
+    width: clamp(75px, 16vh, 130px);
+    height: clamp(75px, 16vh, 130px);
+    font-size: 3rem;
+    font-size: clamp(2.3rem, 7vh, 4.5rem);
   }
 
   .top-bar {
@@ -788,18 +932,9 @@ button.toggle[aria-pressed="false"] {
   }
 }
 
-/* Short viewports (laptop browser chrome, some TVs) */
 @media (max-height: 720px) {
-  .hint {
-    display: none;
-  }
-
   .meta-line {
     display: none;
-  }
-
-  .brand-kicker {
-    letter-spacing: 0.16em;
   }
 
   .tip-body {
@@ -813,11 +948,27 @@ button.toggle[aria-pressed="false"] {
   }
 
   .family-chip .label {
-    font-size: 0.7em;
+    font-size: 0.72em;
   }
 
   .workout-card .w-meta {
     display: none;
+  }
+}
+
+@media (min-width: 1400px) and (min-height: 800px) {
+  html,
+  body {
+    font-size: 24px;
+    font-size: clamp(19px, 1.7vh + 0.5vw, 30px);
+  }
+
+  .home-shell {
+    max-width: 1600px;
+  }
+
+  button {
+    min-height: 2.75em;
   }
 }
 
@@ -831,14 +982,13 @@ button.toggle[aria-pressed="false"] {
   }
 }
 
-/* Fallback if color-mix unsupported */
-@supports not (background: color-mix(in srgb, red 50%, blue)) {
+@supports (background: color-mix(in srgb, red 50%, blue)) {
   .family-chip .badge {
-    background: #2a1f3d;
+    background: color-mix(in srgb, var(--chip-color, var(--sky)) 22%, #1a1024);
   }
 
   .emoji-stage {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.14);
+    background: color-mix(in srgb, var(--block-color, var(--sky)) 18%, transparent);
+    border-color: color-mix(in srgb, var(--block-color, var(--sky)) 45%, transparent);
   }
 }

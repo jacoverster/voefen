@@ -3,7 +3,7 @@
  *
  * HOW TO EDIT
  * -----------
- * 1. Family → FAMILY
+ * 1. Default crew → DEFAULT_FAMILY (users can rename in-app; stored in localStorage)
  * 2. Workouts → WORKOUTS
  *
  * Each workout has three parts:
@@ -20,13 +20,14 @@
 (function () {
   "use strict";
 
-  window.FAMILY = [
-    { id: "dad", label: "Dad", emoji: "👨🏼", color: "#fb923c" },
-    { id: "mom", label: "Mom", emoji: "👩🏼", color: "#a78bfa" },
-    { id: "kid1", label: "Kid 1", emoji: "👦🏼", color: "#34d399" },
-    { id: "kid2", label: "Kid 2", emoji: "👧🏼", color: "#f472b6" },
-    { id: "kid3", label: "Kid 3", emoji: "👦🏼", color: "#fbbf24" },
+  /** Defaults only — live crew is edited in the app and saved to localStorage. */
+  window.DEFAULT_FAMILY = [
+    { id: "p1", label: "Person 1", emoji: "🙂", color: "#fb923c" },
+    { id: "p2", label: "Person 2", emoji: "😊", color: "#a78bfa" },
+    { id: "p3", label: "Person 3", emoji: "😄", color: "#34d399" },
   ];
+  // Back-compat alias
+  window.FAMILY = window.DEFAULT_FAMILY;
 
   /**
    * @param {string} name

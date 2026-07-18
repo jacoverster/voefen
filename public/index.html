@@ -4,9 +4,12 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
     />
     <meta name="theme-color" content="#0f0a14" />
+    <!-- Helps Samsung / Smart TV browsers treat this as a full-viewport app -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta
       name="description"
       content="Voefen — family workouts on the TV. Bodyweight, timers, easy & hard options."
@@ -23,6 +26,7 @@
       href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💪</text></svg>"
     />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="crew.css" />
   </head>
   <body>
     <!-- HOME -->
@@ -38,8 +42,13 @@
         </header>
 
         <div class="team-card">
-          <p class="team-label">Today’s crew</p>
-          <div id="family-row" class="family-row" aria-hidden="true"></div>
+          <div class="team-label-row">
+            <p class="team-label">Today’s crew</p>
+            <button type="button" id="btn-edit-crew" class="ghost quiet btn-sm">
+              Edit
+            </button>
+          </div>
+          <div id="family-row" class="family-row" aria-label="Family members"></div>
         </div>
 
         <div class="workout-picker-wrap">
@@ -74,11 +83,24 @@
           >
             Beeps: On
           </button>
+          <button type="button" id="btn-settings-crew" class="ghost">Edit crew</button>
         </div>
+      </div>
+    </section>
 
-        <p class="hint">
-          Remote: arrows move · Enter selects · Play/Pause or Space pauses
-        </p>
+    <!-- CREW EDITOR -->
+    <section id="screen-crew" class="screen" aria-label="Edit crew">
+      <div class="crew-shell">
+        <header class="crew-header">
+          <h1 class="crew-title">Your crew</h1>
+          <p class="crew-sub">Names are saved on this TV’s browser</p>
+        </header>
+        <div id="crew-list" class="crew-list" role="list"></div>
+        <div class="crew-actions">
+          <button type="button" id="btn-crew-add" class="ghost">+ Add person</button>
+          <button type="button" id="btn-crew-reset" class="ghost quiet">Reset defaults</button>
+          <button type="button" id="btn-crew-done" class="primary btn-xl">Done</button>
+        </div>
       </div>
     </section>
 
@@ -149,6 +171,9 @@
 
     <script src="workout-data.js"></script>
     <script src="audio.js"></script>
+    <script src="timer.js"></script>
+    <script src="crew.js"></script>
+    <script src="remote-nav.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
