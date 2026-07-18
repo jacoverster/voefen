@@ -213,7 +213,7 @@ button.toggle[aria-pressed="false"] {
   gap: 14px;
   gap: clamp(8px, 1.4vh, 18px);
   text-align: center;
-  overflow: hidden;
+  overflow: visible;
   margin: 0 auto;
 }
 
